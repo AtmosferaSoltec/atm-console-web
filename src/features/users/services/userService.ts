@@ -20,8 +20,8 @@ export async function listUsers(signal?: AbortSignal): Promise<UserItem[]> {
 export async function createUser(input: CreateUserInput): Promise<UserItem> {
   const user = await request<UserResponse>('/v1/admin/users', {
     method: 'POST',
-    // An omitted password makes the API use the DNI as the initial password.
-    body: { dni: input.dni, full_name: input.fullName, ...(input.password && { password: input.password }) },
+    // No password is sent: the API makes the DNI the initial password and requires a change at first login.
+    body: { dni: input.dni, full_name: input.fullName },
   })
   return toUserItem(user)
 }

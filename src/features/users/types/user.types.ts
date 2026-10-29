@@ -27,8 +27,6 @@ export interface UserListResponse {
 export interface CreateUserInput {
   dni: string
   fullName: string
-  /** Empty means the DNI is the initial password. */
-  password: string
 }
 
 export interface UsersListProps {

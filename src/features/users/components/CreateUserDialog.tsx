@@ -4,25 +4,19 @@ import { FormField } from '@/components/common/FormField'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/ui/password-input'
 import { useCreateUser } from '../hooks/useCreateUser'
 import type { CreateUserDialogProps } from '../types/user.types'
-
-const MIN_PASSWORD_LENGTH = 8
 
 export function CreateUserDialog({ open, onClose, onCreated }: CreateUserDialogProps) {
   const [dni, setDni] = useState('')
   const [fullName, setFullName] = useState('')
-  const [password, setPassword] = useState('')
   const { create, isSaving, error, clearError } = useCreateUser()
 
-  const passwordTooShort = password !== '' && password.length < MIN_PASSWORD_LENGTH
-  const canSubmit = dni.length === 8 && fullName.trim() !== '' && !passwordTooShort && !isSaving
+  const canSubmit = dni.length === 8 && fullName.trim() !== '' && !isSaving
 
   const handleClose = () => {
     setDni('')
     setFullName('')
-    setPassword('')
     clearError()
     onClose()
   }
@@ -30,7 +24,7 @@ export function CreateUserDialog({ open, onClose, onCreated }: CreateUserDialogP
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
     if (!canSubmit) return
-    if (await create({ dni, fullName: fullName.trim(), password })) {
+    if (await create({ dni, fullName: fullName.trim() })) {
       onCreated()
       handleClose()
     }
@@ -41,7 +35,7 @@ export function CreateUserDialog({ open, onClose, onCreated }: CreateUserDialogP
       open={open}
       onClose={handleClose}
       title="Nuevo usuario"
-      description="Una cuenta por persona, identificada por su DNI. Después le das acceso a sus sistemas."
+      description="Una cuenta por persona, identificada por su DNI. Su contraseña inicial es su mismo DNI y debe cambiarla en su primer ingreso."
       footer={
         <>
           <Button variant="outline" onClick={handleClose}>
@@ -69,14 +63,6 @@ export function CreateUserDialog({ open, onClose, onCreated }: CreateUserDialogP
         </FormField>
         <FormField label="Nombre completo" htmlFor="user-full-name">
           <Input id="user-full-name" placeholder="Ingresa nombres y apellidos" value={fullName} onChange={(event) => setFullName(event.target.value)} />
-        </FormField>
-        <FormField
-          label="Contraseña inicial"
-          htmlFor="user-password"
-          hint="Opcional. Si la dejas vacía, la contraseña es el DNI y deberá cambiarla en su primer ingreso."
-          error={passwordTooShort ? 'Mínimo 8 caracteres.' : undefined}
-        >
-          <PasswordInput id="user-password" placeholder="Ingresa la contraseña (opcional)" value={password} onChange={(event) => setPassword(event.target.value)} />
         </FormField>
         {error && (
           <p role="alert" className="text-sm text-red-600">

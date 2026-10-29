@@ -19,7 +19,7 @@ export function SystemSummary({ system }: SystemSummaryProps) {
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{system.name}</h1>
           <div className="mt-1 flex items-center gap-2">
             <p className="font-mono text-sm text-slate-500">{system.code}</p>
-            <SessionBadge mode={system.sessionMode} minutes={system.sessionMinutes} />
+            <SessionBadge mode={system.sessionMode} />
           </div>
         </div>
       </div>

@@ -7,7 +7,6 @@ const ERROR_MESSAGES: Record<string, string> = {
   system_code_taken: 'Ya existe un sistema con ese código.',
   invalid_system_code: 'El código debe empezar con una letra minúscula.',
   invalid_system_name: 'El nombre es obligatorio.',
-  invalid_session_minutes: 'Los minutos de la sesión temporal deben estar entre 5 y 1440.',
 }
 
 function createErrorMessage(error: unknown): string {

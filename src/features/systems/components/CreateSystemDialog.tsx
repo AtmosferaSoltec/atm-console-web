@@ -5,26 +5,23 @@ import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useCreateSystem } from '../hooks/useCreateSystem'
 import type { CreateSystemDialogProps, SessionMode } from '../types/system.types'
-import { isSessionPolicyValid, SessionPolicyFields } from './SessionPolicyFields'
+import { SessionPolicyFields } from './SessionPolicyFields'
 
 const CODE_PATTERN = /^[a-z][a-z0-9_-]*$/
-const DEFAULT_MINUTES = '30'
 
 export function CreateSystemDialog({ open, onClose, onCreated }: CreateSystemDialogProps) {
   const [code, setCode] = useState('')
   const [name, setName] = useState('')
   const [sessionMode, setSessionMode] = useState<SessionMode>('persistent')
-  const [sessionMinutes, setSessionMinutes] = useState(DEFAULT_MINUTES)
   const { create, isSaving, error, clearError } = useCreateSystem()
 
   const codeInvalid = code !== '' && !CODE_PATTERN.test(code)
-  const canSubmit = name.trim() !== '' && CODE_PATTERN.test(code) && isSessionPolicyValid(sessionMode, sessionMinutes) && !isSaving
+  const canSubmit = name.trim() !== '' && CODE_PATTERN.test(code) && !isSaving
 
   const handleClose = () => {
     setCode('')
     setName('')
     setSessionMode('persistent')
-    setSessionMinutes(DEFAULT_MINUTES)
     clearError()
     onClose()
   }
@@ -32,7 +29,7 @@ export function CreateSystemDialog({ open, onClose, onCreated }: CreateSystemDia
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
     if (!canSubmit) return
-    if (await create({ code, name: name.trim(), session: { mode: sessionMode, minutes: sessionMode === 'temporary' ? Number(sessionMinutes) : 0 } })) {
+    if (await create({ code, name: name.trim(), sessionMode })) {
       onCreated()
       handleClose()
     }
@@ -76,9 +73,7 @@ export function CreateSystemDialog({ open, onClose, onCreated }: CreateSystemDia
         <SessionPolicyFields
           idPrefix="create-system"
           mode={sessionMode}
-          minutes={sessionMinutes}
           onModeChange={setSessionMode}
-          onMinutesChange={setSessionMinutes}
         />
         {error && (
           <p role="alert" className="text-sm text-red-600">

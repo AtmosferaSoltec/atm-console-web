@@ -49,7 +49,7 @@ export function SystemsList({ systems, isLoading, error }: SystemsListProps) {
                   <span className="block font-mono text-xs text-slate-500">{system.code}</span>
                 </Td>
                 <Td>
-                  <SessionBadge mode={system.sessionMode} minutes={system.sessionMinutes} />
+                  <SessionBadge mode={system.sessionMode} />
                 </Td>
                 <Td className="text-slate-500">{formatDate(new Date(system.createdAt))}</Td>
                 <Td>

@@ -1,5 +1,5 @@
 import { request } from '@/services/httpClient'
-import type { CreateSystemInput, IssuedSecret, SessionPolicy, SystemItem, SystemListResponse, SystemResponse } from '../types/system.types'
+import type { CreateSystemInput, IssuedSecret, SessionMode, SystemItem, SystemListResponse, SystemResponse } from '../types/system.types'
 
 function toSystemItem(system: SystemResponse): SystemItem {
   return {
@@ -7,7 +7,6 @@ function toSystemItem(system: SystemResponse): SystemItem {
     code: system.code,
     name: system.name,
     sessionMode: system.session_mode,
-    sessionMinutes: system.session_minutes,
     hasSecret: system.has_secret,
     secretCreatedAt: system.secret_created_at ?? null,
     secretLastUsedAt: system.secret_last_used_at ?? null,
@@ -23,7 +22,7 @@ export async function listSystems(signal?: AbortSignal): Promise<SystemItem[]> {
 export async function createSystem(input: CreateSystemInput): Promise<SystemItem> {
   const system = await request<SystemResponse>('/v1/admin/systems', {
     method: 'POST',
-    body: { code: input.code, name: input.name, session_mode: input.session.mode, session_minutes: input.session.minutes },
+    body: { code: input.code, name: input.name, session_mode: input.sessionMode },
   })
   return toSystemItem(system)
 }
@@ -34,10 +33,10 @@ export async function deleteSystem(systemId: string, confirmCode: string): Promi
 }
 
 /** Sessions already open pick the new policy the next time they are refreshed. */
-export async function updateSystemSession(systemId: string, policy: SessionPolicy): Promise<SystemItem> {
+export async function updateSystemSession(systemId: string, mode: SessionMode): Promise<SystemItem> {
   const system = await request<SystemResponse>(`/v1/admin/systems/${systemId}/session`, {
     method: 'PUT',
-    body: { mode: policy.mode, minutes: policy.minutes },
+    body: { mode },
   })
   return toSystemItem(system)
 }

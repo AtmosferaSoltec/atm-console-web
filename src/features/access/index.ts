@@ -1,0 +1,5 @@
+export { AccessTable } from './components/AccessTable'
+export { AssignAccessDialog } from './components/AssignAccessDialog'
+export { RolesInUseTable } from './components/RolesInUseTable'
+export { useAccessBySystem, useAccessByUser } from './hooks/useAccess'
+export type { AccessItem } from './types/access.types'

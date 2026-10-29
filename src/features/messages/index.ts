@@ -1,0 +1,6 @@
+export { MessageFilters } from './components/MessageFilters'
+export { MessagesTable } from './components/MessagesTable'
+export { SendMessageDialog } from './components/SendMessageDialog'
+export { useMessages } from './hooks/useMessages'
+export { EMPTY_FILTERS } from './services/messageService'
+export type { MessageFiltersValue } from './types/message.types'

@@ -1,0 +1,36 @@
+import { request } from '@/services/httpClient'
+import type { CreateTenantInput, TenantItem, TenantListResponse, TenantResponse } from '../types/tenant.types'
+
+function toTenantItem(tenant: TenantResponse): TenantItem {
+  return {
+    id: tenant.id,
+    ruc: tenant.ruc,
+    legalName: tenant.legal_name,
+    tradeName: tenant.trade_name,
+    displayName: tenant.display_name,
+    status: tenant.status,
+    systems: tenant.systems,
+    createdAt: tenant.created_at,
+  }
+}
+
+export async function listTenants(signal?: AbortSignal): Promise<TenantItem[]> {
+  const { items } = await request<TenantListResponse>('/v1/admin/tenants', { signal })
+  return items.map(toTenantItem)
+}
+
+export async function createTenant(input: CreateTenantInput): Promise<TenantItem> {
+  const tenant = await request<TenantResponse>('/v1/admin/tenants', {
+    method: 'POST',
+    body: { ruc: input.ruc, legal_name: input.legalName, trade_name: input.tradeName },
+  })
+  return toTenantItem(tenant)
+}
+
+export async function enableTenantSystem(tenantId: string, systemId: string): Promise<void> {
+  await request<void>(`/v1/admin/tenants/${tenantId}/systems`, { method: 'POST', body: { system_id: systemId } })
+}
+
+export async function disableTenantSystem(tenantId: string, systemId: string): Promise<void> {
+  await request<void>(`/v1/admin/tenants/${tenantId}/systems/${systemId}`, { method: 'DELETE' })
+}

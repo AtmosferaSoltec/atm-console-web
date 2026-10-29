@@ -1,0 +1,29 @@
+# Production stack of the console. GitHub Actions copies it to /opt/console-web
+# on each deploy; it is not edited by hand on the server.
+#
+# It never builds: the image is compiled once in CI and published to GHCR.
+# The console has no configuration or secrets: it is static, and it reaches the
+# API on its own origin. That is why there is no .env here.
+#
+# The HEALTHCHECK comes with the image (Dockerfile) and asks for /healthz.
+
+networks:
+  shared:
+    name: atm-network
+    external: true
+
+services:
+  app:
+    image: ghcr.io/atmosferasoltec/atm-console-web:${IMAGE_TAG:-latest}
+    container_name: console-web
+    # Loopback only: the host nginx is what publishes it.
+    ports:
+      - '127.0.0.1:3131:8080'
+    networks:
+      - shared
+    restart: unless-stopped
+    security_opt: ['no-new-privileges:true']
+    deploy:
+      resources:
+        limits:
+          memory: 128m

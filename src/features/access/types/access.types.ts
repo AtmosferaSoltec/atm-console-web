@@ -53,12 +53,6 @@ export interface AccessTableProps {
   onChanged: () => void
 }
 
-export interface RolesInUseTableProps {
-  items: AccessItem[]
-  isLoading: boolean
-  error: string | null
-}
-
 export interface AssignAccessDialogProps {
   open: boolean
   onClose: () => void
@@ -67,6 +61,4 @@ export interface AssignAccessDialogProps {
   userId?: string
   /** Fixes the system, so the dialog does not ask for one. */
   systemId?: string
-  /** Roles already in use, offered as suggestions while typing. */
-  roleSuggestions?: string[]
 }

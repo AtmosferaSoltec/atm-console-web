@@ -15,6 +15,14 @@ export function useApiQuery<T>(fetcher: (signal: AbortSignal) => Promise<T>): Ap
   const [state, setState] = useState<QueryState<T>>({ data: null, isLoading: true, error: null })
   const [version, setVersion] = useState(0)
 
+  // A different fetcher means a different question (another system, another user): drop the old answer
+  // right away instead of showing it until the new one arrives.
+  const [currentFetcher, setCurrentFetcher] = useState(() => fetcher)
+  if (currentFetcher !== fetcher) {
+    setCurrentFetcher(() => fetcher)
+    setState({ data: null, isLoading: true, error: null })
+  }
+
   useEffect(() => {
     const controller = new AbortController()
     fetcher(controller.signal).then(

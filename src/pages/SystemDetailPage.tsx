@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ROUTES } from '@/config/routes'
-import { AccessTable, AssignAccessDialog, RolesInUseTable, useAccessBySystem } from '@/features/access'
+import { AccessTable, AssignAccessDialog, useAccessBySystem } from '@/features/access'
+import { RolesTab, useRoles } from '@/features/roles'
 import { SystemCredentialsCard, SystemDangerZone, SystemSessionCard, SystemSummary, useSystem } from '@/features/systems'
 import type { SystemItem } from '@/features/systems'
 import { SystemTenantsTable, useTenants } from '@/features/tenants'
@@ -15,17 +16,17 @@ import { SystemTenantsTable, useTenants } from '@/features/tenants'
 function SystemTabs({ system }: { system: SystemItem }) {
   const tenants = useTenants()
   const access = useAccessBySystem(system.id)
+  const roles = useRoles(system.id)
   const [assigning, setAssigning] = useState(false)
 
   const systemTenants = tenants.tenants.filter((tenant) => tenant.systems.some((item) => item.id === system.id))
-  const roles = [...new Set(access.items.map((item) => item.role))].sort()
 
   return (
     <Tabs defaultValue="users">
       <Card className="mb-6">
         <TabsList>
           <TabsTrigger value="users">Usuarios ({access.items.length})</TabsTrigger>
-          <TabsTrigger value="roles">Roles ({roles.length})</TabsTrigger>
+          <TabsTrigger value="roles">Roles ({roles.roles.length})</TabsTrigger>
           <TabsTrigger value="tenants">Empresas ({systemTenants.length})</TabsTrigger>
         </TabsList>
 
@@ -46,15 +47,17 @@ function SystemTabs({ system }: { system: SystemItem }) {
         </TabsContent>
 
         <TabsContent value="roles">
-          <CardHeader className="items-center pb-3">
-            <div>
-              <CardTitle>Roles en uso</CardTitle>
-              <CardDescription>El rol es texto libre: aparece aquí mientras algún usuario lo tenga. Cada sistema define qué significa.</CardDescription>
-            </div>
-          </CardHeader>
-          <div className="border-t border-slate-100">
-            <RolesInUseTable items={access.items} isLoading={access.isLoading} error={access.error} />
-          </div>
+          <RolesTab
+            systemId={system.id}
+            systemName={system.name}
+            roles={roles.roles}
+            isLoading={roles.isLoading}
+            error={roles.error}
+            onChanged={() => {
+              roles.reload()
+              access.reload()
+            }}
+          />
         </TabsContent>
 
         <TabsContent value="tenants">
@@ -70,7 +73,7 @@ function SystemTabs({ system }: { system: SystemItem }) {
         </TabsContent>
       </Card>
 
-      <AssignAccessDialog open={assigning} onClose={() => setAssigning(false)} onAssigned={access.reload} systemId={system.id} roleSuggestions={roles} />
+      <AssignAccessDialog open={assigning} onClose={() => setAssigning(false)} onAssigned={access.reload} systemId={system.id} />
     </Tabs>
   )
 }

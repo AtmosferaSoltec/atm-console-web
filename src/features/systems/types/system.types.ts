@@ -30,12 +30,6 @@ export interface SystemListResponse {
   items: SystemResponse[]
 }
 
-export interface CreateSystemInput {
-  code: string
-  name: string
-  sessionMode: SessionMode
-}
-
 export interface SystemsListProps {
   systems: SystemItem[]
   isLoading: boolean
@@ -71,24 +65,6 @@ export interface SystemCredentialsCardProps {
   onChanged: () => void
 }
 
-export interface DeleteSystemDialogProps {
-  system: SystemItem
-  open: boolean
-  onClose: () => void
-  onDeleted: () => void
-}
-
-export interface SystemDangerZoneProps {
-  system: SystemItem
-  onDeleted: () => void
-}
-
 export interface SystemSummaryProps {
   system: SystemItem
-}
-
-export interface CreateSystemDialogProps {
-  open: boolean
-  onClose: () => void
-  onCreated: () => void
 }

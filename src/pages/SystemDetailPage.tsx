@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { BackLink } from '@/components/common/BackLink'
 import { NotFoundCard } from '@/components/common/NotFoundCard'
 import { Button } from '@/components/ui/button'
@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ROUTES } from '@/config/routes'
 import { AccessTable, AssignAccessDialog, useAccessBySystem } from '@/features/access'
 import { RolesTab, useRoles } from '@/features/roles'
-import { SystemCredentialsCard, SystemDangerZone, SystemSessionCard, SystemSummary, useSystem } from '@/features/systems'
+import { SystemCredentialsCard, SystemSessionCard, SystemSummary, useSystem } from '@/features/systems'
 import type { SystemItem } from '@/features/systems'
 import { SystemTenantsTable, useTenants } from '@/features/tenants'
 
@@ -80,7 +80,6 @@ function SystemTabs({ system }: { system: SystemItem }) {
 
 export function SystemDetailPage() {
   const { systemId } = useParams()
-  const navigate = useNavigate()
   const { system, isLoading, error, reload } = useSystem(systemId)
 
   return (
@@ -96,7 +95,6 @@ export function SystemDetailPage() {
           <SystemTabs system={system} />
           <SystemSessionCard system={system} onChanged={reload} />
           <SystemCredentialsCard system={system} onChanged={reload} />
-          <SystemDangerZone system={system} onDeleted={() => navigate(ROUTES.auth.systems, { replace: true })} />
         </>
       )}
     </>

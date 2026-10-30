@@ -1,5 +1,5 @@
 import { request } from '@/services/httpClient'
-import type { CreateSystemInput, IssuedSecret, SessionMode, SystemItem, SystemListResponse, SystemResponse } from '../types/system.types'
+import type { IssuedSecret, SessionMode, SystemItem, SystemListResponse, SystemResponse } from '../types/system.types'
 
 function toSystemItem(system: SystemResponse): SystemItem {
   return {
@@ -17,19 +17,6 @@ function toSystemItem(system: SystemResponse): SystemItem {
 export async function listSystems(signal?: AbortSignal): Promise<SystemItem[]> {
   const { items } = await request<SystemListResponse>('/v1/admin/systems', { signal })
   return items.map(toSystemItem)
-}
-
-export async function createSystem(input: CreateSystemInput): Promise<SystemItem> {
-  const system = await request<SystemResponse>('/v1/admin/systems', {
-    method: 'POST',
-    body: { code: input.code, name: input.name, session_mode: input.sessionMode },
-  })
-  return toSystemItem(system)
-}
-
-/** Deletes the system and everything that depends on it. The API requires the system's code as confirmation. */
-export async function deleteSystem(systemId: string, confirmCode: string): Promise<void> {
-  await request<void>(`/v1/admin/systems/${systemId}?confirm=${encodeURIComponent(confirmCode)}`, { method: 'DELETE' })
 }
 
 /** Sessions already open pick the new policy the next time they are refreshed. */

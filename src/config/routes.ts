@@ -39,6 +39,9 @@ export const ROUTES = {
     overview: '/storage/overview',
     files: '/storage/files',
   },
+  pulso: {
+    branches: '/pulso/branches',
+  },
 } as const
 
 export function systemPath(systemId: string): string {

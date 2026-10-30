@@ -15,6 +15,8 @@ export default defineConfig({
       // Same for the documents API, which has no CORS either.
       '/documents-api': { target: 'http://localhost:8085', rewrite: (path) => path.replace(/^\/documents-api/, '') },
       // Same for the messaging API (run it with HTTP_PORT=8083).
+      // Same for the Pulso API (its default port, 3001).
+      '/pulso-api': { target: 'http://localhost:3001', rewrite: (path) => path.replace(/^\/pulso-api/, '') },
       '/messaging-api': { target: 'http://localhost:8083', rewrite: (path) => path.replace(/^\/messaging-api/, '') },
     },
   },

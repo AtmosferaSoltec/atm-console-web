@@ -3,6 +3,7 @@ import {
   Briefcase,
   Building2,
   Database,
+  Dumbbell,
   FileText,
   Files,
   Gauge,
@@ -68,5 +69,9 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: 'Resumen', to: ROUTES.storage.overview, icon: HardDrive },
       { label: 'Archivos', to: ROUTES.storage.files, icon: Files },
     ],
+  },
+  {
+    label: 'Pulso',
+    items: [{ label: 'Sedes', to: ROUTES.pulso.branches, icon: Dumbbell }],
   },
 ]

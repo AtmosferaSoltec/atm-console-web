@@ -10,6 +10,7 @@ import { IdentityRecordsPage } from '@/pages/IdentityRecordsPage'
 import { IdentitySystemsPage } from '@/pages/IdentitySystemsPage'
 import { IdentityUsagePage } from '@/pages/IdentityUsagePage'
 import { LoginPage } from '@/pages/LoginPage'
+import { PulsoPage } from '@/pages/PulsoPage'
 import { StorageOverviewPage } from '@/pages/StorageOverviewPage'
 import { TemplatesPage } from '@/pages/TemplatesPage'
 import { MessagingSystemsPage } from '@/pages/MessagingSystemsPage'
@@ -70,6 +71,7 @@ export function AppRoutes() {
           <Route path={ROUTES.documents.activity} element={<DocumentActivityPage />} />
           <Route path={ROUTES.storage.overview} element={<StorageOverviewPage />} />
           <Route path={ROUTES.storage.files} element={<FilesPage />} />
+          <Route path={ROUTES.pulso.branches} element={<PulsoPage />} />
           <Route path="*" element={<PlaceholderPage />} />
         </Route>
       </Route>

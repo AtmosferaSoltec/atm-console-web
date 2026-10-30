@@ -86,3 +86,10 @@ Pushing to the `production` branch runs `.github/workflows/deploy.yml`: builds t
 | API | Same origin: the host nginx forwards `/v1` to `auth-api` (port `3130`), so there is no API URL in the build and no CORS |
 
 The console has no configuration or secrets on the server.
+
+## Systems and Pulso
+
+- **Systems are not created here.** `atm-auth-api` seeds the catalog of systems (and their roles) from code at startup; the console only lists them, manages their credential and session policy, enables them per company and assigns users. To add a system, add it to that catalog in the auth API.
+- **Pulso > Sedes** (`src/features/pulso`) is where the superadmin creates, renames and deletes the branches of each Pulso gym (a gym is a company of a client with Pulso enabled). Admins of a gym can never create branches. Prices are agreed with the client and are not recorded in any system.
+- The console reaches the Pulso API on its own origin under `/pulso-api/` (Vite proxy in development, port 3001; host nginx in production, see `deploy/nginx-host-pulso-api.conf.example`, loopback port 3081). Override with `VITE_PULSO_API_URL` if needed. The Pulso API must accept the superadmin token of the auth API on `/api/v1/admin/*`.
+

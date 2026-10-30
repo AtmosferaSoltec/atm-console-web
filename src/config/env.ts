@@ -18,3 +18,9 @@ export const DOCUMENTS_API_BASE_URL: string = import.meta.env.VITE_DOCUMENTS_API
  * strips it and forwards to the messaging API; in production the host nginx must do the same.
  */
 export const MESSAGING_API_BASE_URL: string = import.meta.env.VITE_MESSAGING_API_URL || '/messaging-api'
+
+/**
+ * Base URL of the Pulso API. The default is a same-origin prefix: in development the Vite dev server
+ * strips it and forwards to the Pulso API; in production the host nginx must do the same.
+ */
+export const PULSO_API_BASE_URL: string = import.meta.env.VITE_PULSO_API_URL || '/pulso-api'

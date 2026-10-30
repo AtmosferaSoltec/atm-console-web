@@ -41,3 +41,9 @@ project/
 ```
 
 Other modules import from a feature only through its `index.ts` barrel.
+
+## Scope notes
+
+- Systems come from a catalog in `atm-auth-api`; the console must not offer creating or deleting them.
+- The Pulso section calls `/pulso-api/api/v1/admin/*` with the console session token (same pattern as `src/features/storage`).
+

@@ -1,4 +1,5 @@
-export { CreateTemplateDialog } from './components/CreateTemplateDialog'
-export { GeneratedTable } from './components/GeneratedTable'
+export { ServiceCard } from './components/ServiceCard'
+export { TemplatePreviewDialog } from './components/TemplatePreviewDialog'
 export { TemplatesTable } from './components/TemplatesTable'
-export { useGeneratedDocuments, useTemplates } from './hooks/useTemplates'
+export { useCatalog } from './hooks/useTemplates'
+export type { DocumentTemplate } from './types/template.types'

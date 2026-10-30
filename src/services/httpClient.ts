@@ -32,7 +32,8 @@ async function send<T>(path: string, options: RequestOptions, accessToken?: stri
   })
 
   if (response.ok) {
-    return (response.status === 204 ? undefined : await response.json()) as T
+    if (response.status === 204) return undefined as T
+    return (options.responseType === 'blob' ? await response.blob() : await response.json()) as T
   }
 
   const body = (await response.json().catch(() => null)) as ApiErrorBody | null

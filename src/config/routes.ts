@@ -30,7 +30,7 @@ export const ROUTES = {
   },
   documents: {
     templates: '/documents/templates',
-    generated: '/documents/generated',
+    activity: '/documents/activity',
   },
   storage: {
     overview: '/storage/overview',

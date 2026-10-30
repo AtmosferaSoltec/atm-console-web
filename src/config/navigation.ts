@@ -2,7 +2,6 @@ import {
   Activity,
   Building2,
   Database,
-  FileCheck,
   FileText,
   Files,
   Gauge,
@@ -58,7 +57,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Documentos',
     items: [
       { label: 'Plantillas', to: ROUTES.documents.templates, icon: LayoutTemplate },
-      { label: 'Generados', to: ROUTES.documents.generated, icon: FileCheck },
+      { label: 'Actividad', to: ROUTES.documents.activity, icon: Activity },
     ],
   },
   {

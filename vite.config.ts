@@ -12,6 +12,8 @@ export default defineConfig({
       '/v1': 'http://localhost:8080',
       // The storage API also serves /v1, so it lives under its own prefix that the proxy removes.
       '/storage-api': { target: 'http://localhost:8084', rewrite: (path) => path.replace(/^\/storage-api/, '') },
+      // Same for the documents API, which has no CORS either.
+      '/documents-api': { target: 'http://localhost:8085', rewrite: (path) => path.replace(/^\/documents-api/, '') },
     },
   },
   resolve: {

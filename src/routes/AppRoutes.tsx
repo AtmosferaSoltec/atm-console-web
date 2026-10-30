@@ -5,7 +5,7 @@ import { ROUTES } from '@/config/routes'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { PrivateRoute } from '@/routes/PrivateRoute'
 import { FilesPage } from '@/pages/FilesPage'
-import { GeneratedDocumentsPage } from '@/pages/GeneratedDocumentsPage'
+import { DocumentActivityPage } from '@/pages/DocumentActivityPage'
 import { IdentityRecordsPage } from '@/pages/IdentityRecordsPage'
 import { IdentitySystemsPage } from '@/pages/IdentitySystemsPage'
 import { IdentityUsagePage } from '@/pages/IdentityUsagePage'
@@ -63,7 +63,7 @@ export function AppRoutes() {
           <Route path={ROUTES.identity.systems} element={<IdentitySystemsPage />} />
           <Route path={ROUTES.identity.records} element={<IdentityRecordsPage />} />
           <Route path={ROUTES.documents.templates} element={<TemplatesPage />} />
-          <Route path={ROUTES.documents.generated} element={<GeneratedDocumentsPage />} />
+          <Route path={ROUTES.documents.activity} element={<DocumentActivityPage />} />
           <Route path={ROUTES.storage.overview} element={<StorageOverviewPage />} />
           <Route path={ROUTES.storage.files} element={<FilesPage />} />
           <Route path="*" element={<PlaceholderPage />} />

@@ -1,26 +1,47 @@
-import type { DocumentTemplate, GeneratedDocument } from '../types/template.types'
+import { DOCUMENTS_API_BASE_URL } from '@/config/env'
+import { request } from '@/services/httpClient'
+import type { Catalog, CatalogResponse, DocumentService, DocumentTemplate, ServiceResponse, TemplateResponse } from '../types/template.types'
 
-const TEMPLATES: DocumentTemplate[] = [
-  { id: 't1', name: 'Cotización', systemName: 'Olympus', format: 'pdf', version: 4, isActive: true, updatedAt: '12 oct 2026' },
-  { id: 't2', name: 'Contrato de servicio', systemName: 'Olympus', format: 'pdf', version: 2, isActive: true, updatedAt: '03 sep 2026' },
-  { id: 't3', name: 'Recibo de pago', systemName: 'Lavendimia', format: 'pdf', version: 7, isActive: true, updatedAt: '27 oct 2026' },
-  { id: 't4', name: 'Constancia de reserva', systemName: 'Hotel Atmosfera', format: 'pdf', version: 1, isActive: true, updatedAt: '15 jul 2026' },
-  { id: 't5', name: 'Bienvenida', systemName: 'Autenticación', format: 'email', version: 3, isActive: false, updatedAt: '20 ago 2026' },
-]
-
-const GENERATED: GeneratedDocument[] = [
-  { id: 'd1', templateName: 'Recibo de pago', systemName: 'Lavendimia', status: 'ready', size: '92 KB', createdAt: 'hace 2 min' },
-  { id: 'd2', templateName: 'Cotización', systemName: 'Olympus', status: 'ready', size: '148 KB', createdAt: 'hace 11 min' },
-  { id: 'd3', templateName: 'Constancia de reserva', systemName: 'Hotel Atmosfera', status: 'processing', size: null, createdAt: 'hace 12 min' },
-  { id: 'd4', templateName: 'Contrato de servicio', systemName: 'Olympus', status: 'failed', size: null, createdAt: 'hace 40 min' },
-  { id: 'd5', templateName: 'Recibo de pago', systemName: 'Lavendimia', status: 'ready', size: '90 KB', createdAt: 'hace 1 h' },
-]
-
-/** Hardcoded sample data. Replace with real API calls when the console is wired up. */
-export function getTemplates(): DocumentTemplate[] {
-  return TEMPLATES
+function toTemplate(template: TemplateResponse): DocumentTemplate {
+  return {
+    code: template.code,
+    name: template.name,
+    description: template.description,
+    endpoint: template.endpoint,
+    formats: template.formats,
+    limits: {
+      maxItems: template.limits.max_items,
+      maxBodyBytes: template.limits.max_body_bytes,
+      maxLogoBytes: template.limits.max_logo_bytes,
+      maxAmount: template.limits.max_amount,
+    },
+  }
 }
 
-export function getGeneratedDocuments(): GeneratedDocument[] {
-  return GENERATED
+function toService(service: ServiceResponse): DocumentService {
+  return {
+    environment: service.environment,
+    allowedSystems: service.allowed_systems,
+    maxConcurrentRenders: service.max_concurrent_renders,
+    renderTimeoutSeconds: service.render_timeout_seconds,
+  }
+}
+
+export async function getCatalog(signal?: AbortSignal): Promise<Catalog> {
+  const catalog = await request<CatalogResponse>('/v1/admin/templates', { baseUrl: DOCUMENTS_API_BASE_URL, signal })
+  return { service: toService(catalog.service), templates: catalog.templates.map(toTemplate) }
+}
+
+/**
+ * Renders the template with fictional data and returns an object URL for the PDF.
+ * The caller must release it with `URL.revokeObjectURL`.
+ */
+export async function getPreviewUrl(code: string, format: string, signal?: AbortSignal): Promise<string> {
+  const params = new URLSearchParams({ format })
+  const pdf = await request<Blob>(`/v1/admin/templates/${encodeURIComponent(code)}/preview?${params}`, {
+    baseUrl: DOCUMENTS_API_BASE_URL,
+    responseType: 'blob',
+    signal,
+  })
+  return URL.createObjectURL(pdf)
 }

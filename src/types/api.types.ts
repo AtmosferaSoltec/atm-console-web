@@ -27,6 +27,8 @@ export interface RequestOptions {
   formData?: FormData
   /** Base URL of another service. Defaults to the auth API. */
   baseUrl?: string
+  /** How to read a successful response. Defaults to 'json'; use 'blob' for files such as a PDF. */
+  responseType?: 'json' | 'blob'
   /** Attach the bearer token and refresh it when needed. Defaults to true. */
   auth?: boolean
   signal?: AbortSignal

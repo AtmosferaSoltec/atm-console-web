@@ -3,13 +3,13 @@ import { FormField } from '@/components/common/FormField'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { useBranchActions } from '../hooks/useBranchActions'
+import { usePulsoActions } from '../hooks/usePulsoActions'
 import type { BranchDialogProps } from '../types/pulso.types'
 
 function BranchForm({ gym, branch, onClose, onSaved }: Omit<BranchDialogProps, 'open'>) {
   const [name, setName] = useState(branch?.name ?? '')
   const [address, setAddress] = useState(branch?.address ?? '')
-  const { create, update, isBusy, error, clearError } = useBranchActions()
+  const { create, update, isBusy, error, clearError } = usePulsoActions()
   const canSubmit = name.trim() !== '' && !isBusy && (branch !== null || gym !== null)
 
   const handleSubmit = async (event: FormEvent) => {

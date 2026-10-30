@@ -4,7 +4,7 @@ import type { CreateTenantInput, TenantItem, TenantListResponse, TenantResponse,
 function toTenantItem(tenant: TenantResponse): TenantItem {
   return {
     id: tenant.id,
-    ruc: tenant.ruc,
+    ruc: tenant.ruc ?? '',
     legalName: tenant.legal_name,
     tradeName: tenant.trade_name,
     displayName: tenant.display_name,
@@ -32,7 +32,7 @@ export async function listTenants(signal?: AbortSignal): Promise<TenantItem[]> {
 export async function createTenant(input: CreateTenantInput): Promise<TenantItem> {
   const tenant = await request<TenantResponse>('/v1/admin/tenants', {
     method: 'POST',
-    body: { ruc: input.ruc, legal_name: input.legalName, trade_name: input.tradeName, ...(input.clientId ? { client_id: input.clientId } : {}) },
+    body: { ...(input.ruc ? { ruc: input.ruc } : {}), legal_name: input.legalName, trade_name: input.tradeName, ...(input.clientId ? { client_id: input.clientId } : {}) },
   })
   return toTenantItem(tenant)
 }

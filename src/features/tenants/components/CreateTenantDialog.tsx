@@ -19,7 +19,7 @@ export function CreateTenantDialog({ open, onClose, onCreated }: CreateTenantDia
   const { clients } = useClients()
   const { create, isSaving, error, clearError } = useCreateTenant()
 
-  const canSubmit = ruc.length === 11 && legalName.trim() !== '' && !isSaving
+  const canSubmit = (ruc === '' || ruc.length === 11) && legalName.trim() !== '' && !isSaving
 
   const handleClose = () => {
     setRuc('')
@@ -57,7 +57,7 @@ export function CreateTenantDialog({ open, onClose, onCreated }: CreateTenantDia
       }
     >
       <form id="create-tenant-form" onSubmit={handleSubmit} className="space-y-4">
-        <FormField label="RUC" htmlFor="tenant-ruc" hint="11 dígitos.">
+        <FormField label="RUC" htmlFor="tenant-ruc" hint="Opcional. 11 dígitos.">
           <Input
             id="tenant-ruc"
             inputMode="numeric"
@@ -66,7 +66,6 @@ export function CreateTenantDialog({ open, onClose, onCreated }: CreateTenantDia
             className="font-mono"
             value={ruc}
             onChange={(event) => setRuc(event.target.value.replace(/\D/g, ''))}
-            autoFocus
           />
         </FormField>
         <FormField label="Razón social" htmlFor="tenant-legal-name">

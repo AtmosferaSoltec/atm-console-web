@@ -72,6 +72,6 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     label: 'Pulso',
-    items: [{ label: 'Sedes', to: ROUTES.pulso.branches, icon: Dumbbell }],
+    items: [{ label: 'Clientes y gimnasios', to: ROUTES.pulso.branches, icon: Dumbbell }],
   },
 ]

@@ -1,35 +1,52 @@
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { useBranchActions } from '../hooks/useBranchActions'
-import type { Branch, Gym, PulsoClientsListProps } from '../types/pulso.types'
+import { EditTenantDialog, useTenants, type TenantItem } from '@/features/tenants'
+import { usePulsoActions } from '../hooks/usePulsoActions'
+import type { Branch, Gym, PulsoClient, PulsoClientsListProps, TeamMember } from '../types/pulso.types'
 import { BranchDialog } from './BranchDialog'
+import { GymPanel } from './GymPanel'
+import { MemberDialog } from './MemberDialog'
+import { NewGymDialog } from './NewGymDialog'
 
-export function PulsoClientsList({ clients, isLoading, error, onChanged }: PulsoClientsListProps) {
-  const [creatingFor, setCreatingFor] = useState<Gym | null>(null)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [deleting, setDeleting] = useState<Branch | null>(null)
-  const { remove, error: deleteError, clearError } = useBranchActions()
+type Removal = { kind: 'branch'; branch: Branch } | { kind: 'member'; member: TeamMember }
+
+export function PulsoClientsList({ clients, team, isLoading, error, onChanged, onTeamChanged }: PulsoClientsListProps) {
+  const { tenants, reload: reloadTenants } = useTenants()
+  const [newGymFor, setNewGymFor] = useState<PulsoClient | null>(null)
+  const [branchFor, setBranchFor] = useState<Gym | null>(null)
+  const [editingBranchId, setEditingBranchId] = useState<string | null>(null)
+  const [memberFor, setMemberFor] = useState<Gym | null>(null)
+  const [editingCompany, setEditingCompany] = useState<TenantItem | null>(null)
+  const [removal, setRemoval] = useState<Removal | null>(null)
+  const { remove, removeMember, error: removeError, clearError } = usePulsoActions()
   // Looked up in the list so the dialog sees fresh data after a reload.
-  const editing = clients.flatMap((client) => client.gyms).flatMap((gym) => gym.branches).find((branch) => branch.id === editingId) ?? null
+  const editingBranch = clients.flatMap((client) => client.gyms).flatMap((gym) => gym.branches).find((branch) => branch.id === editingBranchId) ?? null
 
-  const handleDelete = async () => {
-    if (!deleting) return
-    if (await remove(deleting.id)) {
-      setDeleting(null)
-      onChanged()
+  const handleRemove = async () => {
+    if (!removal) return
+    if (removal.kind === 'branch') {
+      if (await remove(removal.branch.id)) {
+        setRemoval(null)
+        onChanged()
+      }
+      return
+    }
+    if (await removeMember(removal.member.id)) {
+      setRemoval(null)
+      onTeamChanged()
     }
   }
 
-  const closeDelete = () => {
+  const closeRemoval = () => {
     clearError()
-    setDeleting(null)
+    setRemoval(null)
   }
 
   if (isLoading || error || clients.length === 0) {
-    const message = isLoading ? 'Cargando clientes...' : (error ?? 'Todavía no hay clientes con Pulso habilitado.')
+    const message = isLoading ? 'Cargando clientes...' : (error ?? 'Todavía no hay clientes. Crea el primero.')
     return (
       <Card>
         <p className="p-6 text-center text-sm text-slate-500">{message}</p>
@@ -37,55 +54,51 @@ export function PulsoClientsList({ clients, isLoading, error, onChanged }: Pulso
     )
   }
 
+  const removalText =
+    removal?.kind === 'member'
+      ? { title: 'Quitar acceso', description: `${removal.member.userName} dejará de entrar a ${removal.member.tenantName} en Pulso. Su cuenta se conserva.`, confirm: 'Quitar' }
+      : { title: 'Eliminar sede', description: `Se eliminará la sede ${removal?.branch.name ?? ''}. Esta acción no se puede deshacer.`, confirm: 'Eliminar' }
+
   return (
     <div className="space-y-4">
       {clients.map((client) => (
         <Card key={client.id}>
-          <h2 className="border-b border-slate-100 px-5 py-3 text-base font-semibold text-slate-900">{client.name}</h2>
-          {client.gyms.length === 0 && <p className="px-5 py-4 text-sm text-slate-400">Sin gimnasios con Pulso habilitado.</p>}
+          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3">
+            <h2 className="text-base font-semibold text-slate-900">{client.name}</h2>
+            <Button variant="ghost" size="icon" aria-label={`Nuevo gimnasio de ${client.name}`} title="Nuevo gimnasio" onClick={() => setNewGymFor(client)}>
+              <Plus className="size-4" />
+            </Button>
+          </div>
+          {client.gyms.length === 0 && <p className="px-5 py-4 text-sm text-slate-400">Sin gimnasios.</p>}
           {client.gyms.map((gym) => (
-            <div key={gym.id} className="border-b border-slate-100 px-5 py-4 last:border-b-0">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-medium text-slate-900">{gym.name}</p>
-                  <p className="text-xs text-slate-500">RUC {gym.ruc}</p>
-                </div>
-                <Button variant="ghost" size="icon" aria-label={`Agregar sede a ${gym.name}`} title="Agregar sede" onClick={() => setCreatingFor(gym)}>
-                  <Plus className="size-4" />
-                </Button>
-              </div>
-              <ul className="mt-2 divide-y divide-slate-100">
-                {gym.branches.length === 0 && <li className="py-2 text-sm text-slate-400">Sin sedes.</li>}
-                {gym.branches.map((branch) => (
-                  <li key={branch.id} className="flex items-center justify-between gap-3 py-2">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm text-slate-800">{branch.name}</p>
-                      {branch.address && <p className="truncate text-xs text-slate-500">{branch.address}</p>}
-                    </div>
-                    <span className="flex gap-1">
-                      <Button variant="ghost" size="icon" aria-label={`Editar ${branch.name}`} title="Editar" onClick={() => setEditingId(branch.id)}>
-                        <Pencil className="size-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" aria-label={`Eliminar ${branch.name}`} title="Eliminar" onClick={() => setDeleting(branch)}>
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <GymPanel
+              key={gym.id}
+              gym={gym}
+              tenant={tenants.find((tenant) => tenant.id === gym.tenantId)}
+              members={team.members.filter((member) => member.tenantId === gym.tenantId)}
+              onEditCompany={setEditingCompany}
+              onAddBranch={setBranchFor}
+              onEditBranch={(branch) => setEditingBranchId(branch.id)}
+              onDeleteBranch={(branch) => setRemoval({ kind: 'branch', branch })}
+              onAddMember={setMemberFor}
+              onRemoveMember={(member) => setRemoval({ kind: 'member', member })}
+              onChanged={onChanged}
+            />
           ))}
         </Card>
       ))}
-      <BranchDialog open={creatingFor !== null} gym={creatingFor} branch={null} onClose={() => setCreatingFor(null)} onSaved={onChanged} />
-      <BranchDialog open={editing !== null} gym={null} branch={editing} onClose={() => setEditingId(null)} onSaved={onChanged} />
+      <NewGymDialog client={newGymFor} systemId={team.systemId} onClose={() => setNewGymFor(null)} onSaved={() => { onChanged(); onTeamChanged(); reloadTenants() }} />
+      <BranchDialog open={branchFor !== null} gym={branchFor} branch={null} onClose={() => setBranchFor(null)} onSaved={onChanged} />
+      <BranchDialog open={editingBranch !== null} gym={null} branch={editingBranch} onClose={() => setEditingBranchId(null)} onSaved={onChanged} />
+      <MemberDialog gym={memberFor} systemId={team.systemId} onClose={() => setMemberFor(null)} onSaved={onTeamChanged} />
+      <EditTenantDialog tenant={editingCompany} onClose={() => setEditingCompany(null)} onSaved={() => { reloadTenants(); onChanged() }} />
       <ConfirmDialog
-        open={deleting !== null}
-        onClose={closeDelete}
-        onConfirm={handleDelete}
-        title="Eliminar sede"
-        description={deleteError ?? `Se eliminará la sede ${deleting?.name ?? ''}. Esta acción no se puede deshacer.`}
-        confirmLabel="Eliminar"
+        open={removal !== null}
+        onClose={closeRemoval}
+        onConfirm={handleRemove}
+        title={removalText.title}
+        description={removeError ?? removalText.description}
+        confirmLabel={removalText.confirm}
         destructive
       />
     </div>

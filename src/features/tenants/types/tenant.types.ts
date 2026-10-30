@@ -9,6 +9,7 @@ export interface TenantSystem {
 
 export interface TenantItem {
   id: string
+  /** '' when the company has no RUC. */
   ruc: string
   legalName: string
   tradeName: string
@@ -36,7 +37,8 @@ export interface TenantItem {
 
 export interface TenantResponse {
   id: string
-  ruc: string
+  /** Null while the company has no RUC. */
+  ruc: string | null
   legal_name: string
   trade_name: string
   display_name: string
@@ -60,6 +62,7 @@ export interface TenantListResponse {
 }
 
 export interface CreateTenantInput {
+  /** Optional: '' creates the company without a RUC. */
   ruc: string
   legalName: string
   tradeName: string

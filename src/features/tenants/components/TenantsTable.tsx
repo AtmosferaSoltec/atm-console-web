@@ -35,7 +35,7 @@ export function TenantsTable({ tenants, emptyMessage, onEdit, onManageSystems, o
                 </span>
               </span>
             </Td>
-            <Td className="font-mono text-slate-600">{tenant.ruc}</Td>
+            <Td className="font-mono text-slate-600">{tenant.ruc || <span className="text-slate-400">Sin RUC</span>}</Td>
             <Td className="text-slate-600">{tenant.clientName}</Td>
             <Td>
               {tenant.systems.length === 0 ? (

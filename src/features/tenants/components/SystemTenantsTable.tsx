@@ -20,7 +20,7 @@ export function SystemTenantsTable({ tenants, isLoading, error }: SystemTenantsT
               <span className="block font-medium text-slate-900">{tenant.displayName}</span>
               {tenant.tradeName && <span className="block text-xs text-slate-500">{tenant.legalName}</span>}
             </Td>
-            <Td className="font-mono text-slate-600">{tenant.ruc}</Td>
+            <Td className="font-mono text-slate-600">{tenant.ruc || <span className="text-slate-400">Sin RUC</span>}</Td>
           </Tr>
         ))}
       </TBody>

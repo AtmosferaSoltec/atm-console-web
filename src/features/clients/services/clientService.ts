@@ -5,7 +5,7 @@ function toClientItem(client: ClientResponse): ClientItem {
   return {
     id: client.id,
     name: client.name,
-    tenants: client.tenants.map((tenant) => ({ id: tenant.id, ruc: tenant.ruc, displayName: tenant.display_name })),
+    tenants: client.tenants.map((tenant) => ({ id: tenant.id, ruc: tenant.ruc ?? '', displayName: tenant.display_name })),
     createdAt: client.created_at,
   }
 }

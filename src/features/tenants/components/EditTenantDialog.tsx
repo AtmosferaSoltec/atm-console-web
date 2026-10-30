@@ -65,7 +65,7 @@ function EditTenantForm({ tenant, onClose, onSaved }: EditTenantFormProps) {
       onClose={handleClose}
       size="lg"
       title="Datos de la empresa"
-      description={`RUC ${tenant.ruc}. Todo es opcional salvo la razón social. Los sistemas leen estos datos desde aquí.`}
+      description={`${tenant.ruc ? `RUC ${tenant.ruc}. ` : ''}Todo es opcional salvo la razón social. Los sistemas leen estos datos desde aquí.`}
       footer={
         <>
           <Button variant="outline" onClick={handleClose} disabled={isSaving}>

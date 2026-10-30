@@ -36,6 +36,8 @@ export interface AssignAccessInput {
   systemId: string
   tenantId: string
   role: string
+  /** Lets the person manage the members of their own company in the system. */
+  manageUsers?: boolean
 }
 
 export type AccessTableVariant = 'byUser' | 'bySystem'

@@ -16,7 +16,7 @@ export interface ClientItem {
 
 export interface ClientTenantResponse {
   id: string
-  ruc: string
+  ruc: string | null
   display_name: string
 }
 

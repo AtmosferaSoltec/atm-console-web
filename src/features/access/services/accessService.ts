@@ -40,6 +40,7 @@ export async function assignAccess(input: AssignAccessInput): Promise<void> {
       system_id: input.systemId,
       tenant_id: input.tenantId,
       role: input.role,
+      ...(input.manageUsers ? { manage_users: true } : {}),
     },
   })
 }

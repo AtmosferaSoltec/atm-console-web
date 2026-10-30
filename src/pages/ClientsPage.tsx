@@ -12,7 +12,7 @@ export function ClientsPage() {
     <>
       <PageHeader
         title="Clientes"
-        description="Los dueños de las empresas. Las empresas de un mismo cliente pueden compartir datos dentro de un sistema, como los compradores."
+        description="Las personas o negocios a los que atiendes. Las empresas de un mismo cliente pueden compartir datos dentro de un sistema, como los compradores."
         actions={
           <Button onClick={() => setCreating(true)}>
             <Plus className="size-4" />

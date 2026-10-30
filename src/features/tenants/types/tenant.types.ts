@@ -25,7 +25,7 @@ export interface TenantItem {
   email: string
   /** Id of the logo in the storage API, or '' when there is none. */
   logoFileId: string
-  /** The owner of the company. Companies of one client can share data inside a system. */
+  /** The client the company belongs to. Companies of one client can share data inside a system. */
   clientId: string
   clientName: string
   status: EntityStatus

@@ -75,7 +75,7 @@ export function CreateTenantDialog({ open, onClose, onCreated }: CreateTenantDia
         <FormField label="Nombre comercial" htmlFor="tenant-trade-name" hint="Opcional. Es el nombre que se muestra en pantalla.">
           <Input id="tenant-trade-name" placeholder="Ingresa el nombre comercial" value={tradeName} onChange={(event) => setTradeName(event.target.value)} />
         </FormField>
-        <FormField label="Cliente" htmlFor="tenant-client" hint="El dueño de la empresa. Elige uno existente si ya tiene otras empresas y quieres que compartan datos.">
+        <FormField label="Cliente" htmlFor="tenant-client" hint="A quién pertenece la empresa. Elige uno existente si ya tiene otras empresas y quieres que compartan datos.">
           <Select
             id="tenant-client"
             value={clientId}

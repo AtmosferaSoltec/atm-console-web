@@ -25,7 +25,7 @@ function ClientForm({ client, onClose, onSaved }: Omit<ClientDialogProps, 'open'
       open
       onClose={isSaving ? () => undefined : onClose}
       title={client ? 'Renombrar cliente' : 'Nuevo cliente'}
-      description="El cliente es el dueño real: puede tener varias empresas y los sistemas pueden compartir datos entre ellas."
+      description="El cliente es la persona o negocio al que atiendes: puede tener varias empresas y los sistemas pueden compartir datos entre ellas."
       footer={
         <>
           <Button variant="outline" onClick={onClose} disabled={isSaving}>

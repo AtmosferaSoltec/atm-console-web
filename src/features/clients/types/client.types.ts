@@ -5,7 +5,7 @@ export interface ClientTenant {
   displayName: string
 }
 
-/** The real customer: the owner of one or more companies. */
+/** The real customer: the person or business that has one or more companies. */
 export interface ClientItem {
   id: string
   name: string

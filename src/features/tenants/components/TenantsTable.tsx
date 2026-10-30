@@ -4,6 +4,7 @@ import { StatusBadge } from '@/components/common/StatusBadge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Table, TBody, Td, Th, THead, Tr } from '@/components/ui/table'
+import { CompanyLogo } from '@/features/storage'
 import { formatDate } from '@/utils/format'
 import type { TenantsTableProps } from '../types/tenant.types'
 
@@ -25,8 +26,13 @@ export function TenantsTable({ tenants, emptyMessage, onEdit, onManageSystems }:
         {tenants.map((tenant) => (
           <Tr key={tenant.id}>
             <Td>
-              <span className="block font-medium text-slate-900">{tenant.displayName}</span>
-              {tenant.tradeName && <span className="block text-xs text-slate-500">{tenant.legalName}</span>}
+              <span className="flex items-center gap-3">
+                <CompanyLogo fileId={tenant.logoFileId} name={tenant.displayName} />
+                <span className="min-w-0">
+                  <span className="block font-medium text-slate-900">{tenant.displayName}</span>
+                  {tenant.tradeName && <span className="block text-xs text-slate-500">{tenant.legalName}</span>}
+                </span>
+              </span>
             </Td>
             <Td className="font-mono text-slate-600">{tenant.ruc}</Td>
             <Td>

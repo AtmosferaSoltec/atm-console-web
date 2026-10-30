@@ -1,3 +1,4 @@
+export { CompanyLogo } from './components/CompanyLogo'
 export { CompanyLogoField } from './components/CompanyLogoField'
 export { FilesList } from './components/FilesList'
 export { UploadDialog } from './components/UploadDialog'

@@ -120,6 +120,13 @@ export interface ImagePreviewDialogProps {
   onClose: () => void
 }
 
+export interface CompanyLogoProps {
+  /** Id of the logo, or '' when the company has none (a placeholder is shown). */
+  fileId: string
+  /** Company name, for the image description. */
+  name: string
+}
+
 export interface CompanyLogoFieldProps {
   companyId: string
   /** Id of the current logo, or '' when there is none. */

@@ -1,3 +1,5 @@
+import type { AccessItem } from '@/features/access'
+import type { SystemItem } from '@/features/systems'
 import type { EntityStatus } from '@/types/common.types'
 
 export interface UserItem {
@@ -33,6 +35,11 @@ export interface UsersListProps {
   users: UserItem[]
   isLoading: boolean
   error: string | null
+  /** Accesses of all systems; they tell which users belong to which system and company. */
+  access: AccessItem[]
+  systems: SystemItem[]
+  isAccessLoading: boolean
+  accessError: string | null
 }
 
 export interface UserSummaryProps {

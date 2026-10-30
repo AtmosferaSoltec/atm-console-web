@@ -41,6 +41,7 @@ export interface SelectProps {
   placeholder?: string
   leadingIcon?: LucideIcon
   className?: string
+  disabled?: boolean
   'aria-label'?: string
 }
 
@@ -148,6 +149,8 @@ export interface ListToolbarProps {
   /** The status filter is shown only when both `status` and `onStatusChange` are given. */
   status?: string
   onStatusChange?: (value: string) => void
+  /** Extra filters, shown after the status filter. */
+  children?: ReactNode
 }
 
 export interface EmptyRowProps {

@@ -3,14 +3,14 @@ import { Check, ChevronDown } from 'lucide-react'
 import type { SelectProps } from '@/types/ui.types'
 import { cn } from '@/utils/cn'
 
-export function Select({ id, value, onValueChange, options, placeholder, leadingIcon: LeadingIcon, className, 'aria-label': ariaLabel }: SelectProps) {
+export function Select({ id, value, onValueChange, options, placeholder, leadingIcon: LeadingIcon, className, disabled, 'aria-label': ariaLabel }: SelectProps) {
   return (
-    <RadixSelect.Root value={value} onValueChange={onValueChange}>
+    <RadixSelect.Root value={value} onValueChange={onValueChange} disabled={disabled}>
       <RadixSelect.Trigger
         id={id}
         aria-label={ariaLabel}
         className={cn(
-          'flex h-10 w-full cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 data-[placeholder]:text-slate-400',
+          'flex h-10 w-full cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 data-[placeholder]:text-slate-400 data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
           className,
         )}
       >

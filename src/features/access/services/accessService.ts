@@ -27,6 +27,12 @@ export async function listAccessBySystem(systemId: string, signal?: AbortSignal)
   return items.map(toAccessItem)
 }
 
+/** Every access of the given systems; a user has at most one per system, so this is the whole picture. */
+export async function listAccessBySystems(systemIds: string[], signal?: AbortSignal): Promise<AccessItem[]> {
+  const lists = await Promise.all(systemIds.map((systemId) => listAccessBySystem(systemId, signal)))
+  return lists.flat()
+}
+
 export async function assignAccess(input: AssignAccessInput): Promise<void> {
   await request<AccessResponse>('/v1/admin/access', {
     method: 'POST',

@@ -20,7 +20,7 @@ export function AccessTable({ items, variant, isLoading, error, onChanged }: Acc
 
   const handleConfirm = async () => {
     if (!revoking) return
-    if (await remove(revoking.userId, revoking.systemId)) {
+    if (await remove(revoking.id)) {
       setRevoking(null)
       onChanged()
     }

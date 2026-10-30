@@ -56,7 +56,7 @@ export function AssignAccessDialog({ open, onClose, onAssigned, userId, systemId
       open={open}
       onClose={handleClose}
       title="Asignar acceso"
-      description="Un usuario solo puede pertenecer a una empresa por sistema."
+      description="Un usuario puede trabajar para varias empresas en el mismo sistema: asígnale una por vez."
       footer={
         <>
           <Button variant="outline" onClick={handleClose}>

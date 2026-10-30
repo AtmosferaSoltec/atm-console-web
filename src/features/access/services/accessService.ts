@@ -46,7 +46,7 @@ export async function assignAccess(input: AssignAccessInput): Promise<void> {
   })
 }
 
-/** A user has at most one access per system, so the pair identifies it. */
-export async function removeAccess(userId: string, systemId: string): Promise<void> {
-  await request<void>(`/v1/admin/users/${userId}/access/${systemId}`, { method: 'DELETE' })
+/** A user can work for several companies in one system, so an access is removed by its own id. */
+export async function removeAccess(accessId: string): Promise<void> {
+  await request<void>(`/v1/admin/access/${accessId}`, { method: 'DELETE' })
 }

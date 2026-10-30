@@ -1,32 +1,81 @@
-import type { Bucket, StorageSummary, StoredFile } from '../types/storage.types'
+import { STORAGE_API_BASE_URL } from '@/config/env'
+import { request } from '@/services/httpClient'
+import type {
+  DownloadResponse,
+  FileFilters,
+  FileListResponse,
+  FilePage,
+  FileResponse,
+  StoredFile,
+  StorageSummary,
+  SummaryResponse,
+  UploadInput,
+} from '../types/storage.types'
+import { targetParams } from './storageTargets'
 
-const BUCKETS: Bucket[] = [
-  { id: 'b1', name: 'olympus-docs', systemName: 'Olympus', filesCount: 4820, sizeGb: 28.6, isPublic: false, createdAt: '14 ene 2026' },
-  { id: 'b2', name: 'lavendimia-media', systemName: 'Lavendimia', filesCount: 3104, sizeGb: 18.9, isPublic: false, createdAt: '14 ene 2026' },
-  { id: 'b3', name: 'nubefact-pdfs', systemName: 'Facturación', filesCount: 2210, sizeGb: 9.4, isPublic: false, createdAt: '02 feb 2026' },
-  { id: 'b4', name: 'avatars', systemName: 'Autenticación', filesCount: 640, sizeGb: 7.3, isPublic: true, createdAt: '21 feb 2026' },
-]
+export const FILES_PAGE_SIZE = 25
+/** Server defaults; the API answers `file_too_large` when its configured limits are lower. */
+export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024
+export const MAX_LOGO_BYTES = 2 * 1024 * 1024
 
-const FILES: StoredFile[] = [
-  { id: 'f1', name: 'guia-remision-T001-97.pdf', bucketName: 'nubefact-pdfs', kind: 'pdf', size: '184 KB', uploadedAt: 'hace 4 min' },
-  { id: 'f2', name: 'producto-camisa-azul.webp', bucketName: 'lavendimia-media', kind: 'image', size: '312 KB', uploadedAt: 'hace 18 min' },
-  { id: 'f3', name: 'contrato-agro-norte.docx', bucketName: 'olympus-docs', kind: 'document', size: '1.2 MB', uploadedAt: 'hace 1 h' },
-  { id: 'f4', name: 'entrega-evidencia-0412.mp4', bucketName: 'olympus-docs', kind: 'video', size: '24.8 MB', uploadedAt: 'hace 3 h' },
-  { id: 'f5', name: 'maria-quispe.png', bucketName: 'avatars', kind: 'image', size: '96 KB', uploadedAt: 'ayer' },
-  { id: 'f6', name: 'respaldo-clientes.csv', bucketName: 'olympus-docs', kind: 'other', size: '3.4 MB', uploadedAt: 'ayer' },
-]
-
-const SUMMARY: StorageSummary = { usedGb: 64.2, limitGb: 100, filesCount: 10774, bucketsCount: 4 }
-
-/** Hardcoded sample data. Replace with real API calls when the console is wired up. */
-export function getBuckets(): Bucket[] {
-  return BUCKETS
+function toStoredFile(file: FileResponse): StoredFile {
+  return {
+    id: file.id,
+    companyId: file.company_id,
+    system: file.system,
+    scope: file.scope,
+    filename: file.filename,
+    contentType: file.content_type,
+    size: file.size,
+    createdAt: file.created_at,
+  }
 }
 
-export function getFiles(): StoredFile[] {
-  return FILES
+export async function listFiles(filters: FileFilters, signal?: AbortSignal): Promise<FilePage> {
+  const params = new URLSearchParams({ limit: String(FILES_PAGE_SIZE), offset: String(filters.offset) })
+  if (filters.companyId) params.set('company_id', filters.companyId)
+  const { scope, system } = targetParams(filters.target)
+  if (scope) params.set('scope', scope)
+  if (system) params.set('system', system)
+  const { items, total } = await request<FileListResponse>(`/v1/files?${params}`, { baseUrl: STORAGE_API_BASE_URL, signal })
+  return { items: items.map(toStoredFile), total }
 }
 
-export function getStorageSummary(): StorageSummary {
-  return SUMMARY
+export async function getStorageSummary(signal?: AbortSignal): Promise<StorageSummary> {
+  const summary = await request<SummaryResponse>('/v1/files/summary', { baseUrl: STORAGE_API_BASE_URL, signal })
+  return {
+    filesCount: summary.files_count,
+    totalBytes: summary.total_bytes,
+    usage: summary.usage.map((item) => ({ scope: item.scope, system: item.system, filesCount: item.files_count, totalBytes: item.total_bytes })),
+  }
+}
+
+export async function uploadFile(input: UploadInput): Promise<StoredFile> {
+  const { scope, system } = targetParams(input.target)
+  const params = new URLSearchParams({ scope: scope ?? 'system', purpose: scope === 'company' ? 'logo' : 'file' })
+  if (system) params.set('system', system)
+  const formData = new FormData()
+  formData.append('file', input.file)
+  const file = await request<FileResponse>(`/v1/companies/${input.companyId}/files?${params}`, {
+    method: 'POST',
+    formData,
+    baseUrl: STORAGE_API_BASE_URL,
+  })
+  return toStoredFile(file)
+}
+
+/** A short-lived signed URL; never store it. */
+export async function getDownloadUrl(fileId: string): Promise<string> {
+  const { url } = await request<DownloadResponse>(`/v1/files/${fileId}/download`, { baseUrl: STORAGE_API_BASE_URL })
+  return url
+}
+
+/** A short-lived signed URL that displays the image in the browser; never store it. */
+export async function getPreviewUrl(fileId: string, signal?: AbortSignal): Promise<string> {
+  const { url } = await request<DownloadResponse>(`/v1/files/${fileId}/preview`, { baseUrl: STORAGE_API_BASE_URL, signal })
+  return url
+}
+
+export async function deleteFile(fileId: string): Promise<void> {
+  await request<void>(`/v1/files/${fileId}`, { method: 'DELETE', baseUrl: STORAGE_API_BASE_URL })
 }

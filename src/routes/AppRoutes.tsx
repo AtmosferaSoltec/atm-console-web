@@ -4,13 +4,13 @@ import { NAV_GROUPS } from '@/config/navigation'
 import { ROUTES } from '@/config/routes'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { PrivateRoute } from '@/routes/PrivateRoute'
-import { BucketsPage } from '@/pages/BucketsPage'
 import { FilesPage } from '@/pages/FilesPage'
 import { GeneratedDocumentsPage } from '@/pages/GeneratedDocumentsPage'
 import { IdentityRecordsPage } from '@/pages/IdentityRecordsPage'
 import { IdentitySystemsPage } from '@/pages/IdentitySystemsPage'
 import { IdentityUsagePage } from '@/pages/IdentityUsagePage'
 import { LoginPage } from '@/pages/LoginPage'
+import { StorageOverviewPage } from '@/pages/StorageOverviewPage'
 import { TemplatesPage } from '@/pages/TemplatesPage'
 import { ApiClientsPage } from '@/pages/ApiClientsPage'
 import { CompaniesPage } from '@/pages/CompaniesPage'
@@ -64,7 +64,7 @@ export function AppRoutes() {
           <Route path={ROUTES.identity.records} element={<IdentityRecordsPage />} />
           <Route path={ROUTES.documents.templates} element={<TemplatesPage />} />
           <Route path={ROUTES.documents.generated} element={<GeneratedDocumentsPage />} />
-          <Route path={ROUTES.storage.buckets} element={<BucketsPage />} />
+          <Route path={ROUTES.storage.overview} element={<StorageOverviewPage />} />
           <Route path={ROUTES.storage.files} element={<FilesPage />} />
           <Route path="*" element={<PlaceholderPage />} />
         </Route>

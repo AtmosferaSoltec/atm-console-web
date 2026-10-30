@@ -15,6 +15,20 @@ export function formatDateTime(date: Date): string {
   return format(date, 'd MMM yyyy, HH:mm', { locale: es })
 }
 
+const BYTE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB']
+
+/** 1536 -> '1,5 KB'. */
+export function formatBytes(bytes: number): string {
+  let value = bytes
+  let unit = 0
+  while (value >= 1024 && unit < BYTE_UNITS.length - 1) {
+    value /= 1024
+    unit += 1
+  }
+  const digits = unit === 0 || value >= 100 ? 0 : 1
+  return `${value.toLocaleString('es-PE', { maximumFractionDigits: digits })} ${BYTE_UNITS[unit]}`
+}
+
 /** '51936416623' -> '+51 936 416 623'. */
 export function formatPhone(digits: string): string {
   return digits.replace(/^(\d{2})(\d{3})(\d{3})(\d{3})$/, '+$1 $2 $3 $4')

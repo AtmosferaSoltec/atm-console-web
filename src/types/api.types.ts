@@ -23,6 +23,10 @@ export interface SessionTokens {
 export interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   body?: unknown
+  /** Multipart body, sent as is so the browser sets the boundary. Wins over `body`. */
+  formData?: FormData
+  /** Base URL of another service. Defaults to the auth API. */
+  baseUrl?: string
   /** Attach the bearer token and refresh it when needed. Defaults to true. */
   auth?: boolean
   signal?: AbortSignal

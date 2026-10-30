@@ -21,13 +21,13 @@ export class ApiError extends Error {
 
 async function send<T>(path: string, options: RequestOptions, accessToken?: string): Promise<T> {
   const headers: Record<string, string> = {}
-  if (options.body !== undefined) headers['Content-Type'] = 'application/json'
+  if (options.body !== undefined && !options.formData) headers['Content-Type'] = 'application/json'
   if (accessToken) headers.Authorization = `Bearer ${accessToken}`
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${options.baseUrl ?? API_BASE_URL}${path}`, {
     method: options.method ?? 'GET',
     headers,
-    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+    body: options.formData ?? (options.body !== undefined ? JSON.stringify(options.body) : undefined),
     signal: options.signal,
   })
 

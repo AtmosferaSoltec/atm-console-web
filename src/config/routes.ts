@@ -33,7 +33,7 @@ export const ROUTES = {
     generated: '/documents/generated',
   },
   storage: {
-    buckets: '/storage/buckets',
+    overview: '/storage/overview',
     files: '/storage/files',
   },
 } as const

@@ -8,7 +8,11 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     // The auth API has no CORS: in development the browser talks to the dev server, which forwards /v1.
-    proxy: { '/v1': 'http://localhost:8080' },
+    proxy: {
+      '/v1': 'http://localhost:8080',
+      // The storage API also serves /v1, so it lives under its own prefix that the proxy removes.
+      '/storage-api': { target: 'http://localhost:8084', rewrite: (path) => path.replace(/^\/storage-api/, '') },
+    },
   },
   resolve: {
     alias: {

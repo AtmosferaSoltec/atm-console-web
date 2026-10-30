@@ -2,29 +2,27 @@ import { Upload } from 'lucide-react'
 import { useState } from 'react'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { FilesTable, UploadDialog, useFiles } from '@/features/storage'
+import { FilesList, UploadDialog, useStorageNames } from '@/features/storage'
 
 export function FilesPage() {
-  const files = useFiles()
+  const names = useStorageNames()
   const [uploading, setUploading] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   return (
     <>
       <PageHeader
         title="Archivos"
-        description="Lo último que subieron los sistemas, en todos los buckets."
+        description="Lo que guardaron los sistemas y los logos de las empresas. Descarga o elimina desde aquí."
         actions={
           <Button onClick={() => setUploading(true)}>
             <Upload className="size-4" />
-            Subir archivos
+            Subir archivo
           </Button>
         }
       />
-      <Card>
-        <FilesTable files={files} />
-      </Card>
-      <UploadDialog open={uploading} onClose={() => setUploading(false)} />
+      <FilesList names={names} refreshKey={refreshKey} />
+      <UploadDialog open={uploading} onClose={() => setUploading(false)} onUploaded={() => setRefreshKey((key) => key + 1)} tenants={names.tenants} />
     </>
   )
 }

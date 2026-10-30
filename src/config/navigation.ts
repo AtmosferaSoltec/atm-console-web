@@ -6,11 +6,11 @@ import {
   FileText,
   Files,
   Gauge,
+  HardDrive,
   KeyRound,
   Layers,
   LayoutTemplate,
   MessagesSquare,
-  Package,
   Receipt,
   Smartphone,
   Truck,
@@ -64,7 +64,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Almacenamiento',
     items: [
-      { label: 'Buckets', to: ROUTES.storage.buckets, icon: Package },
+      { label: 'Resumen', to: ROUTES.storage.overview, icon: HardDrive },
       { label: 'Archivos', to: ROUTES.storage.files, icon: Files },
     ],
   },

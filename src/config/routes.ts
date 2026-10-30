@@ -1,5 +1,7 @@
 export const ROUTES = {
   login: '/login',
+  /** Public page a customer opens from a link to scan their WhatsApp QR. */
+  connect: '/connect/:token',
   dashboard: '/dashboard',
   auth: {
     systems: '/auth/systems',
@@ -10,7 +12,7 @@ export const ROUTES = {
   },
   messaging: {
     sessions: '/messaging/sessions',
-    apiClients: '/messaging/api-clients',
+    systems: '/messaging/systems',
     messages: '/messaging/messages',
   },
   billing: {

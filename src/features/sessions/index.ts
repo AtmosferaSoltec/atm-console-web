@@ -1,5 +1,6 @@
 export { ConnectLinkDialog } from './components/ConnectLinkDialog'
 export { CreateSessionDialog } from './components/CreateSessionDialog'
 export { SessionsTable } from './components/SessionsTable'
+export { useDeleteSession, useDisconnectSession } from './hooks/useSessionActions'
 export { useSessions } from './hooks/useSessions'
 export type { Session, SessionStatus } from './types/session.types'

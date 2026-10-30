@@ -20,11 +20,11 @@ const ERROR_LABELS: Record<string, string> = {
 }
 
 export const KIND_OPTIONS: KindOption[] = [
-  { value: 'text', label: 'Texto', icon: MessageSquareText, hint: '' },
-  { value: 'image', label: 'Imagen', icon: ImageIcon, hint: 'JPG, PNG o WebP' },
-  { value: 'video', label: 'Video', icon: Video, hint: 'MP4' },
-  { value: 'audio', label: 'Audio', icon: Music, hint: 'MP3 u OGG' },
-  { value: 'document', label: 'Documento', icon: FileText, hint: 'PDF, Word, Excel, PowerPoint, TXT o CSV' },
+  { value: 'text', label: 'Texto', icon: MessageSquareText, hint: '', accept: '' },
+  { value: 'image', label: 'Imagen', icon: ImageIcon, hint: 'JPG, PNG o WebP', accept: 'image/jpeg,image/png,image/webp' },
+  { value: 'video', label: 'Video', icon: Video, hint: 'MP4', accept: 'video/mp4' },
+  { value: 'audio', label: 'Audio', icon: Music, hint: 'MP3 u OGG', accept: 'audio/mpeg,audio/ogg' },
+  { value: 'document', label: 'Documento', icon: FileText, hint: 'PDF, Word, Excel, PowerPoint, TXT o CSV', accept: '.pdf,.txt,.csv,.docx,.xlsx,.pptx' },
 ]
 
 export function MessageStatusBadge({ status }: { status: MessageStatus }) {

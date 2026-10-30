@@ -42,3 +42,14 @@ export function formatMoney(amount: number, currency: 'PEN' | 'USD'): string {
 export function formatDocumentNumber(series: string, number: number): string {
   return `${series}-${String(number).padStart(6, '0')}`
 }
+
+const MINUTE_MS = 60_000
+const HOUR_MINUTES = 60
+
+/** Time left until `iso`, e.g. '3 h 20 min' or '45 min'. */
+export function formatRemaining(iso: string): string {
+  const minutes = Math.max(0, Math.round((Date.parse(iso) - Date.now()) / MINUTE_MS))
+  const hours = Math.floor(minutes / HOUR_MINUTES)
+  const rest = minutes % HOUR_MINUTES
+  return hours > 0 ? `${hours} h ${rest} min` : `${rest} min`
+}

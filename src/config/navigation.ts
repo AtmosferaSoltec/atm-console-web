@@ -32,7 +32,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Mensajería',
     items: [
       { label: 'Conexiones', to: ROUTES.messaging.sessions, icon: Smartphone },
-      { label: 'Sistemas cliente', to: ROUTES.messaging.apiClients, icon: Workflow },
+      { label: 'Sistemas', to: ROUTES.messaging.systems, icon: Workflow },
       { label: 'Mensajes', to: ROUTES.messaging.messages, icon: MessagesSquare },
     ],
   },

@@ -9,9 +9,10 @@ interface QueryState<T> {
 
 /**
  * Runs `fetcher` on mount and on `reload`. `fetcher` must be a stable reference (module-level function or useCallback).
+ * With `refreshMs` it also reloads on that interval, keeping the current data on screen meanwhile.
  * Authentication failures are handled by the HTTP client, which ends the session.
  */
-export function useApiQuery<T>(fetcher: (signal: AbortSignal) => Promise<T>): ApiQuery<T> {
+export function useApiQuery<T>(fetcher: (signal: AbortSignal) => Promise<T>, refreshMs?: number): ApiQuery<T> {
   const [state, setState] = useState<QueryState<T>>({ data: null, isLoading: true, error: null })
   const [version, setVersion] = useState(0)
 
@@ -34,6 +35,12 @@ export function useApiQuery<T>(fetcher: (signal: AbortSignal) => Promise<T>): Ap
     )
     return () => controller.abort()
   }, [fetcher, version])
+
+  useEffect(() => {
+    if (!refreshMs) return
+    const timer = window.setInterval(() => setVersion((current) => current + 1), refreshMs)
+    return () => window.clearInterval(timer)
+  }, [refreshMs])
 
   return { ...state, reload: () => setVersion((current) => current + 1) }
 }

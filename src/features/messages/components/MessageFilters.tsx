@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { useApiClients } from '@/features/api-clients'
+import { useMessagingSystems } from '@/features/messaging-systems'
 import type { SelectOption } from '@/types/ui.types'
 import type { MessageFiltersProps } from '../types/message.types'
 import { STATUS_BADGES } from './MessageBadges'
@@ -18,8 +18,11 @@ const PRIORITY_OPTIONS: SelectOption[] = [
 ]
 
 export function MessageFilters({ value, onChange }: MessageFiltersProps) {
-  const clients = useApiClients()
-  const clientOptions: SelectOption[] = [{ value: 'all', label: 'Todos los sistemas' }, ...clients.map((client) => ({ value: client.name, label: client.name }))]
+  const { systems } = useMessagingSystems()
+  const clientOptions: SelectOption[] = [
+    { value: 'all', label: 'Todos los sistemas' },
+    ...systems.flatMap((system) => (system.tenantId ? [{ value: system.tenantId, label: system.name }] : [])),
+  ]
 
   return (
     <div className="flex flex-col gap-3 border-b border-slate-100 p-4 lg:flex-row lg:items-center">
@@ -34,7 +37,7 @@ export function MessageFilters({ value, onChange }: MessageFiltersProps) {
       </div>
       <Select className="lg:w-44" aria-label="Estado" value={value.status} onValueChange={(status) => onChange({ ...value, status })} options={STATUS_OPTIONS} />
       <Select className="lg:w-44" aria-label="Prioridad" value={value.priority} onValueChange={(priority) => onChange({ ...value, priority })} options={PRIORITY_OPTIONS} />
-      <Select className="lg:w-44" aria-label="Sistema" value={value.clientName} onValueChange={(clientName) => onChange({ ...value, clientName })} options={clientOptions} />
+      <Select className="lg:w-44" aria-label="Sistema" value={value.tenantId} onValueChange={(tenantId) => onChange({ ...value, tenantId })} options={clientOptions} />
     </div>
   )
 }

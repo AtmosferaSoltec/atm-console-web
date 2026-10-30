@@ -1,10 +1,15 @@
 import { EmptyRow } from '@/components/common/EmptyRow'
 import { Table, TBody, Td, Th, THead, Tr } from '@/components/ui/table'
-import { formatPhone } from '@/utils/format'
+import { formatDateTime, formatPhone } from '@/utils/format'
 import type { MessagesTableProps } from '../types/message.types'
 import { describeMessageError, MessageKindLabel, MessagePriorityBadge, MessageStatusBadge } from './MessageBadges'
 
-export function MessagesTable({ messages, compact = false }: MessagesTableProps) {
+function emptyMessage(isLoading: boolean, error: string | null): string {
+  if (isLoading) return 'Cargando mensajes...'
+  return error ?? 'No hay mensajes con estos filtros.'
+}
+
+export function MessagesTable({ messages, isLoading = false, error = null, compact = false }: MessagesTableProps) {
   return (
     <Table>
       <THead>
@@ -19,10 +24,10 @@ export function MessagesTable({ messages, compact = false }: MessagesTableProps)
         </Tr>
       </THead>
       <TBody>
-        {messages.length === 0 && <EmptyRow colSpan={compact ? 5 : 7} message="No hay mensajes con estos filtros." />}
+        {messages.length === 0 && <EmptyRow colSpan={compact ? 5 : 7} message={emptyMessage(isLoading, error)} />}
         {messages.map((message) => (
           <Tr key={message.id}>
-            <Td className="whitespace-nowrap text-slate-500">{message.when}</Td>
+            <Td className="whitespace-nowrap text-slate-500">{formatDateTime(new Date(message.createdAt))}</Td>
             <Td>
               <p className="font-medium text-slate-900">{message.accountRef}</p>
               <p className="text-xs text-slate-400">{message.clientName}</p>

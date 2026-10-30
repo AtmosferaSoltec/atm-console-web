@@ -7,13 +7,13 @@ import { Card } from '@/components/ui/card'
 import { EMPTY_FILTERS, MessageFilters, MessagesTable, SendMessageDialog, useMessages } from '@/features/messages'
 import type { MessageFiltersValue } from '@/features/messages'
 
-const PAGE_SIZE = 6
+const PAGE_SIZE = 25
 
 export function MessagesPage() {
   const [sending, setSending] = useState(false)
   const [filters, setFilters] = useState<MessageFiltersValue>(EMPTY_FILTERS)
   const [page, setPage] = useState(0)
-  const { rows, total, hasMore } = useMessages(filters, page, PAGE_SIZE)
+  const { rows, hasMore, isLoading, error } = useMessages(filters, page, PAGE_SIZE)
 
   const handleFilters = (next: MessageFiltersValue) => {
     setFilters(next)
@@ -41,9 +41,9 @@ export function MessagesPage() {
 
       <Card>
         <MessageFilters value={filters} onChange={handleFilters} />
-        <MessagesTable messages={rows} />
+        <MessagesTable messages={rows} isLoading={isLoading} error={error} />
         <PaginationFooter
-          summary={total === 0 ? 'Sin resultados' : `Página ${page + 1} · ${rows.length} de ${total} mensajes`}
+          summary={rows.length === 0 ? 'Sin resultados' : `Página ${page + 1} · ${rows.length} ${rows.length === 1 ? 'mensaje' : 'mensajes'}`}
           hasPrevious={page > 0}
           hasNext={hasMore}
           onPrevious={() => setPage((current) => current - 1)}

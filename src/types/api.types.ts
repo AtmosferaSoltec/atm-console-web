@@ -21,7 +21,7 @@ export interface SessionTokens {
 }
 
 export interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   body?: unknown
   /** Multipart body, sent as is so the browser sets the boundary. Wins over `body`. */
   formData?: FormData

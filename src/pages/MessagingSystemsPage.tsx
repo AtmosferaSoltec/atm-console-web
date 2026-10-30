@@ -1,62 +1,64 @@
-import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { PageHeader } from '@/components/common/PageHeader'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { ApiClientsTable, CreateApiClientDialog, CredentialsDialog, useApiClients, useSampleCredentials, WebhookDialog } from '@/features/api-clients'
-import type { ApiClient } from '@/features/api-clients'
+import { MessagingSystemsTable, useEnableSystem, useMessagingSystems, useSetSystemActive, WebhookDialog } from '@/features/messaging-systems'
+import type { MessagingSystem } from '@/features/messaging-systems'
 
-export function ApiClientsPage() {
-  const clients = useApiClients()
-  const [creating, setCreating] = useState(false)
-  const [webhookTarget, setWebhookTarget] = useState<ApiClient | null>(null)
-  const [rotateTarget, setRotateTarget] = useState<ApiClient | null>(null)
-  const [rotatedCredentialsFor, setRotatedCredentialsFor] = useState<ApiClient | null>(null)
-  const [deactivateTarget, setDeactivateTarget] = useState<ApiClient | null>(null)
-  const rotatedCredentials = useSampleCredentials(rotatedCredentialsFor?.name ?? '')
+export function MessagingSystemsPage() {
+  const { systems, isLoading, error, reload } = useMessagingSystems()
+  const enable = useEnableSystem()
+  const setActive = useSetSystemActive()
+  const [webhookTarget, setWebhookTarget] = useState<MessagingSystem | null>(null)
+  const [deactivateTarget, setDeactivateTarget] = useState<MessagingSystem | null>(null)
 
-  const handleToggle = (client: ApiClient) => {
-    if (client.isActive) setDeactivateTarget(client)
+  const handleEnable = async (system: MessagingSystem) => {
+    if ((await enable.run(system.code)) !== null) reload()
   }
+
+  const handleToggle = async (system: MessagingSystem) => {
+    if (system.isActive) {
+      setDeactivateTarget(system)
+      return
+    }
+    if (system.tenantId && (await setActive.run(system.tenantId, true)) !== null) reload()
+  }
+
+  const handleDeactivate = async () => {
+    const target = deactivateTarget
+    setDeactivateTarget(null)
+    if (target?.tenantId && (await setActive.run(target.tenantId, false)) !== null) reload()
+  }
+
+  const actionError = enable.error ?? setActive.error
 
   return (
     <>
       <PageHeader
-        title="Sistemas cliente"
-        description="Las aplicaciones que envían mensajes por la API. Cada una tiene su propia API key y su webhook."
-        actions={
-          <Button onClick={() => setCreating(true)}>
-            <Plus className="size-4" />
-            Nuevo sistema
-          </Button>
-        }
+        title="Sistemas en mensajería"
+        description="Todos los sistemas registrados en Autenticación pueden enviar mensajes con su credencial: aparecen aquí solos la primera vez que lo usan."
       />
+
+      {actionError && <p className="mb-3 rounded-lg bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{actionError}</p>}
 
       <Card>
-        <ApiClientsTable clients={clients} onConfigureWebhook={setWebhookTarget} onRotateKey={setRotateTarget} onToggleActive={handleToggle} />
+        <MessagingSystemsTable
+          systems={systems}
+          isLoading={isLoading}
+          error={error}
+          onEnable={handleEnable}
+          onConfigureWebhook={setWebhookTarget}
+          onToggleActive={handleToggle}
+        />
       </Card>
 
-      <CreateApiClientDialog open={creating} onClose={() => setCreating(false)} />
-      <WebhookDialog client={webhookTarget} onClose={() => setWebhookTarget(null)} />
-      <CredentialsDialog credentials={rotatedCredentialsFor ? rotatedCredentials : null} heading="Nueva API key" onClose={() => setRotatedCredentialsFor(null)} />
-      <ConfirmDialog
-        open={rotateTarget !== null}
-        onClose={() => setRotateTarget(null)}
-        onConfirm={() => {
-          setRotatedCredentialsFor(rotateTarget)
-          setRotateTarget(null)
-        }}
-        title="¿Rotar la API key?"
-        description={`La key actual de ${rotateTarget?.name ?? ''} dejará de funcionar al instante. Tendrás que darle la nueva al sistema.`}
-        confirmLabel="Rotar key"
-      />
+      <WebhookDialog system={webhookTarget} onClose={() => setWebhookTarget(null)} onSaved={reload} />
       <ConfirmDialog
         open={deactivateTarget !== null}
         onClose={() => setDeactivateTarget(null)}
-        onConfirm={() => setDeactivateTarget(null)}
-        title="¿Desactivar este sistema?"
-        description={`${deactivateTarget?.name ?? ''} no podrá usar la API hasta que lo actives de nuevo. Sus conexiones se conservan.`}
+        onConfirm={handleDeactivate}
+        title="¿Desactivar este sistema en mensajería?"
+        description={`${deactivateTarget?.name ?? ''} no podrá enviar mensajes hasta que lo actives de nuevo. Sus conexiones se conservan.`}
         confirmLabel="Desactivar"
         destructive
       />

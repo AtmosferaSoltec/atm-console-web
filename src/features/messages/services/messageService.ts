@@ -1,32 +1,66 @@
-import type { MessageFiltersValue, MessageRow, MessagesPageResult } from '../types/message.types'
+import { messagingRequest } from '@/services/messagingClient'
+import type {
+  Attachment,
+  Message,
+  MessageFiltersValue,
+  MessageResponse,
+  MessagesPage,
+  MessageStatus,
+  SendMessageInput,
+} from '../types/message.types'
 
-export const EMPTY_FILTERS: MessageFiltersValue = { clientName: 'all', status: 'all', priority: 'all', search: '' }
+export const EMPTY_FILTERS: MessageFiltersValue = { tenantId: 'all', status: 'all', priority: 'all', search: '' }
 
-const MESSAGES: MessageRow[] = [
-  { id: 'm1', when: 'hace 2 min', accountRef: 'olympus-courier', clientName: 'Olympus', recipient: '51987654321', kind: 'text', priority: 'transactional', status: 'delivered', error: null, attempts: 1 },
-  { id: 'm2', when: 'hace 6 min', accountRef: 'pulso-ventas', clientName: 'Pulso', recipient: '51912345678', kind: 'image', priority: 'transactional', status: 'read', error: null, attempts: 1 },
-  { id: 'm3', when: 'hace 9 min', accountRef: 'agro-norte', clientName: 'Olympus', recipient: '51955120044', kind: 'text', priority: 'promotional', status: 'queued', error: null, attempts: 0 },
-  { id: 'm4', when: 'hace 14 min', accountRef: 'olympus-courier', clientName: 'Olympus', recipient: '51903778112', kind: 'document', priority: 'transactional', status: 'failed', error: 'recipient_not_on_channel', attempts: 3 },
-  { id: 'm5', when: 'hace 21 min', accountRef: 'lavendimia-centro', clientName: 'Lavendimia', recipient: '51944210987', kind: 'text', priority: 'transactional', status: 'delivered', error: null, attempts: 1 },
-  { id: 'm6', when: 'hace 28 min', accountRef: 'pulso-ventas', clientName: 'Pulso', recipient: '51966321458', kind: 'audio', priority: 'transactional', status: 'sent', error: null, attempts: 1 },
-  { id: 'm7', when: 'hace 35 min', accountRef: 'olympus-courier', clientName: 'Olympus', recipient: '51987112233', kind: 'video', priority: 'promotional', status: 'sending', error: null, attempts: 1 },
-  { id: 'm8', when: 'hace 41 min', accountRef: 'lavendimia-centro', clientName: 'Lavendimia', recipient: '51922334455', kind: 'text', priority: 'transactional', status: 'failed', error: 'session_not_connected', attempts: 5 },
-  { id: 'm9', when: 'hace 52 min', accountRef: 'agro-norte', clientName: 'Olympus', recipient: '51933445566', kind: 'text', priority: 'transactional', status: 'read', error: null, attempts: 1 },
-  { id: 'm10', when: 'hace 1 h', accountRef: 'pulso-ventas', clientName: 'Pulso', recipient: '51977889900', kind: 'document', priority: 'transactional', status: 'delivered', error: null, attempts: 1 },
-  { id: 'm11', when: 'hace 1 h', accountRef: 'olympus-courier', clientName: 'Olympus', recipient: '51911223344', kind: 'text', priority: 'promotional', status: 'failed', error: 'recipient_opted_out', attempts: 1 },
-  { id: 'm12', when: 'hace 2 h', accountRef: 'lavendimia-centro', clientName: 'Lavendimia', recipient: '51999887766', kind: 'image', priority: 'transactional', status: 'delivered', error: null, attempts: 1 },
-]
+const MESSAGES = '/admin/v1/messages'
 
-/** Hardcoded sample data. Replace with real API calls when the console is wired up. */
-export function getMessages(filters: MessageFiltersValue, page: number, pageSize: number): MessagesPageResult {
-  const term = filters.search.replace(/\D/g, '')
-  const matching = MESSAGES.filter(
-    (message) =>
-      (filters.clientName === 'all' || message.clientName === filters.clientName) &&
-      (filters.status === 'all' || message.status === filters.status) &&
-      (filters.priority === 'all' || message.priority === filters.priority) &&
-      (term === '' || message.recipient.includes(term)),
-  )
-  const start = page * pageSize
-  return { rows: matching.slice(start, start + pageSize), total: matching.length, hasMore: start + pageSize < matching.length }
+function toMessage(message: MessageResponse): Message {
+  return {
+    id: message.id,
+    tenantId: message.tenant_id,
+    sessionId: message.session_id,
+    recipient: message.to,
+    kind: message.type,
+    priority: message.priority,
+    status: message.status,
+    attempts: message.attempts,
+    error: message.error ?? null,
+    createdAt: message.created_at,
+  }
+}
+
+/** The API never returns message content, only who it went to and how it fared. */
+export async function listMessages(filters: MessageFiltersValue, page: number, pageSize: number, signal?: AbortSignal): Promise<MessagesPage> {
+  const params = new URLSearchParams({ limit: String(pageSize), offset: String(page * pageSize) })
+  if (filters.tenantId !== 'all') params.set('tenant_id', filters.tenantId)
+  if (filters.status !== 'all') params.set('status', filters.status)
+  if (filters.priority !== 'all') params.set('priority', filters.priority)
+  const search = filters.search.trim()
+  if (search) params.set('q', search)
+
+  const response = await messagingRequest<{ items: MessageResponse[]; has_more: boolean }>(`${MESSAGES}?${params}`, { signal })
+  return { items: response.items.map(toMessage), hasMore: response.has_more }
+}
+
+export async function getMessage(messageId: string, signal?: AbortSignal): Promise<Message> {
+  return toMessage(await messagingRequest<MessageResponse>(`${MESSAGES}/${messageId}`, { signal }))
+}
+
+function toAttachmentBody(attachment: Attachment) {
+  return { filename: attachment.filename, mime_type: attachment.mimeType, content_base64: attachment.contentBase64 }
+}
+
+/** Sends through the same queue and limits as a system's message; it counts as that system's. */
+export async function sendMessage(input: SendMessageInput): Promise<{ messageId: string; status: MessageStatus }> {
+  const response = await messagingRequest<{ message_id: string; status: MessageStatus }>(MESSAGES, {
+    method: 'POST',
+    body: {
+      session_id: input.sessionId,
+      to: input.to,
+      type: input.kind,
+      body: input.body,
+      priority: input.priority,
+      attachment: input.attachment ? toAttachmentBody(input.attachment) : undefined,
+    },
+  })
+  return { messageId: response.message_id, status: response.status }
 }

@@ -2,12 +2,17 @@ import { Link2, Send, Trash2, Unlink } from 'lucide-react'
 import { EmptyRow } from '@/components/common/EmptyRow'
 import { Button } from '@/components/ui/button'
 import { Table, TBody, Td, Th, THead, Tr } from '@/components/ui/table'
-import { formatPhone } from '@/utils/format'
+import { formatDateTime, formatPhone } from '@/utils/format'
 import type { SessionsTableProps } from '../types/session.types'
 import { AccountAvatar } from './AccountAvatar'
 import { SessionStatusBadge } from './SessionStatusBadge'
 
-export function SessionsTable({ sessions, onGenerateLink, onSendMessage, onDisconnect, onDelete }: SessionsTableProps) {
+function emptyMessage(isLoading: boolean, error: string | null): string {
+  if (isLoading) return 'Cargando conexiones...'
+  return error ?? 'Ninguna conexión con este estado.'
+}
+
+export function SessionsTable({ sessions, isLoading, error, onGenerateLink, onSendMessage, onDisconnect, onDelete }: SessionsTableProps) {
   return (
     <Table className="min-w-[900px]">
       <THead>
@@ -21,7 +26,7 @@ export function SessionsTable({ sessions, onGenerateLink, onSendMessage, onDisco
         </Tr>
       </THead>
       <TBody>
-        {sessions.length === 0 && <EmptyRow colSpan={6} message="Ninguna conexión con este estado." />}
+        {sessions.length === 0 && <EmptyRow colSpan={6} message={emptyMessage(isLoading, error)} />}
         {sessions.map((session) => (
           <Tr key={session.id}>
             <Td>
@@ -35,7 +40,7 @@ export function SessionsTable({ sessions, onGenerateLink, onSendMessage, onDisco
               <SessionStatusBadge status={session.status} />
             </Td>
             <Td className="whitespace-nowrap">{session.phone ? formatPhone(session.phone) : <span className="text-slate-400">Sin vincular</span>}</Td>
-            <Td className="whitespace-nowrap text-slate-500">{session.lastConnection ?? '—'}</Td>
+            <Td className="whitespace-nowrap text-slate-500">{session.connectedAt ? formatDateTime(new Date(session.connectedAt)) : '—'}</Td>
             <Td>
               <div className="flex items-center justify-end gap-1">
                 <Button variant="outline" size="sm" onClick={() => onGenerateLink(session)}>

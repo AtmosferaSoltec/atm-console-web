@@ -12,7 +12,8 @@ import { IdentityUsagePage } from '@/pages/IdentityUsagePage'
 import { LoginPage } from '@/pages/LoginPage'
 import { StorageOverviewPage } from '@/pages/StorageOverviewPage'
 import { TemplatesPage } from '@/pages/TemplatesPage'
-import { ApiClientsPage } from '@/pages/ApiClientsPage'
+import { MessagingSystemsPage } from '@/pages/MessagingSystemsPage'
+import { ConnectPage } from '@/pages/ConnectPage'
 import { CompaniesPage } from '@/pages/CompaniesPage'
 import { CompanyDetailPage } from '@/pages/CompanyDetailPage'
 import { CompanyNewPage } from '@/pages/CompanyNewPage'
@@ -40,6 +41,7 @@ export function AppRoutes() {
     <Routes>
       <Route path="/" element={<Navigate to={ROUTES.login} replace />} />
       <Route path={ROUTES.login} element={<LoginPage />} />
+      <Route path={ROUTES.connect} element={<ConnectPage />} />
 
       <Route element={<PrivateRoute />}>
         <Route element={<DashboardLayout />}>
@@ -49,7 +51,7 @@ export function AppRoutes() {
           <Route path={ROUTES.auth.users} element={<UsersPage />} />
           <Route path={ROUTES.auth.userDetail} element={<UserDetailPage />} />
           <Route path={ROUTES.messaging.sessions} element={<SessionsPage />} />
-          <Route path={ROUTES.messaging.apiClients} element={<ApiClientsPage />} />
+          <Route path={ROUTES.messaging.systems} element={<MessagingSystemsPage />} />
           <Route path={ROUTES.messaging.messages} element={<MessagesPage />} />
           <Route path={ROUTES.billing.companies} element={<CompaniesPage />} />
           <Route path={ROUTES.billing.companyNew} element={<CompanyNewPage />} />

@@ -14,6 +14,8 @@ export default defineConfig({
       '/storage-api': { target: 'http://localhost:8084', rewrite: (path) => path.replace(/^\/storage-api/, '') },
       // Same for the documents API, which has no CORS either.
       '/documents-api': { target: 'http://localhost:8085', rewrite: (path) => path.replace(/^\/documents-api/, '') },
+      // Same for the messaging API (run it with HTTP_PORT=8083).
+      '/messaging-api': { target: 'http://localhost:8083', rewrite: (path) => path.replace(/^\/messaging-api/, '') },
     },
   },
   resolve: {

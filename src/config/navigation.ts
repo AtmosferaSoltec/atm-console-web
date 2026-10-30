@@ -1,5 +1,6 @@
 import {
   Activity,
+  Briefcase,
   Building2,
   Database,
   FileText,
@@ -24,6 +25,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Autenticación',
     items: [
       { label: 'Sistemas', to: ROUTES.auth.systems, icon: Layers },
+      { label: 'Clientes', to: ROUTES.auth.clients, icon: Briefcase },
       { label: 'Empresas', to: ROUTES.auth.tenants, icon: Building2 },
       { label: 'Usuarios', to: ROUTES.auth.users, icon: Users },
     ],

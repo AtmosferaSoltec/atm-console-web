@@ -25,6 +25,9 @@ export interface TenantItem {
   email: string
   /** Id of the logo in the storage API, or '' when there is none. */
   logoFileId: string
+  /** The owner of the company. Companies of one client can share data inside a system. */
+  clientId: string
+  clientName: string
   status: EntityStatus
   systems: TenantSystem[]
   /** ISO 8601 timestamp. */
@@ -45,6 +48,8 @@ export interface TenantResponse {
   phone: string
   email: string
   logo_file_id: string | null
+  client_id: string
+  client_name: string
   status: EntityStatus
   systems: TenantSystem[]
   created_at: string
@@ -58,6 +63,8 @@ export interface CreateTenantInput {
   ruc: string
   legalName: string
   tradeName: string
+  /** The client that owns the company. Without it the company gets a new client named after it. */
+  clientId?: string
 }
 
 export interface UpdateTenantInput {
@@ -78,6 +85,7 @@ export interface TenantsTableProps {
   emptyMessage: string
   onEdit: (tenant: TenantItem) => void
   onManageSystems: (tenant: TenantItem) => void
+  onChangeClient: (tenant: TenantItem) => void
 }
 
 export interface EditTenantDialogProps {
@@ -126,6 +134,18 @@ export interface TenantSystemsDialogProps {
 }
 
 export interface TenantSystemsFormProps {
+  tenant: TenantItem
+  onClose: () => void
+  onSaved: () => void
+}
+
+export interface TenantClientDialogProps {
+  tenant: TenantItem | null
+  onClose: () => void
+  onSaved: () => void
+}
+
+export interface TenantClientFormProps {
   tenant: TenantItem
   onClose: () => void
   onSaved: () => void

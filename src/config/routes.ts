@@ -6,6 +6,7 @@ export const ROUTES = {
   auth: {
     systems: '/auth/systems',
     systemDetail: '/auth/systems/:systemId',
+    clients: '/auth/clients',
     tenants: '/auth/tenants',
     users: '/auth/users',
     userDetail: '/auth/users/:userId',

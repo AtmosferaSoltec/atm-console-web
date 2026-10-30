@@ -1,4 +1,4 @@
-import { Pencil, Settings2 } from 'lucide-react'
+import { Pencil, Settings2, UserRoundCog } from 'lucide-react'
 import { EmptyRow } from '@/components/common/EmptyRow'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { Badge } from '@/components/ui/badge'
@@ -8,21 +8,22 @@ import { CompanyLogo } from '@/features/storage'
 import { formatDate } from '@/utils/format'
 import type { TenantsTableProps } from '../types/tenant.types'
 
-export function TenantsTable({ tenants, emptyMessage, onEdit, onManageSystems }: TenantsTableProps) {
+export function TenantsTable({ tenants, emptyMessage, onEdit, onManageSystems, onChangeClient }: TenantsTableProps) {
   return (
     <Table className="min-w-[820px]">
       <THead>
         <Tr>
           <Th>Empresa</Th>
           <Th>RUC</Th>
+          <Th>Cliente</Th>
           <Th>Sistemas contratados</Th>
           <Th>Estado</Th>
           <Th>Creada</Th>
-          <Th className="w-24" />
+          <Th className="w-32" />
         </Tr>
       </THead>
       <TBody>
-        {tenants.length === 0 && <EmptyRow colSpan={6} message={emptyMessage} />}
+        {tenants.length === 0 && <EmptyRow colSpan={7} message={emptyMessage} />}
         {tenants.map((tenant) => (
           <Tr key={tenant.id}>
             <Td>
@@ -35,6 +36,7 @@ export function TenantsTable({ tenants, emptyMessage, onEdit, onManageSystems }:
               </span>
             </Td>
             <Td className="font-mono text-slate-600">{tenant.ruc}</Td>
+            <Td className="text-slate-600">{tenant.clientName}</Td>
             <Td>
               {tenant.systems.length === 0 ? (
                 <span className="text-slate-400">Ninguno</span>
@@ -54,6 +56,15 @@ export function TenantsTable({ tenants, emptyMessage, onEdit, onManageSystems }:
             <Td className="text-slate-500">{formatDate(new Date(tenant.createdAt))}</Td>
             <Td>
               <span className="flex justify-end gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Cambiar de cliente a ${tenant.displayName}`}
+                  title="Cambiar de cliente"
+                  onClick={() => onChangeClient(tenant)}
+                >
+                  <UserRoundCog className="size-4" />
+                </Button>
                 <Button variant="ghost" size="icon" aria-label={`Editar datos de ${tenant.displayName}`} title="Editar datos" onClick={() => onEdit(tenant)}>
                   <Pencil className="size-4" />
                 </Button>

@@ -14,6 +14,7 @@ import { StorageOverviewPage } from '@/pages/StorageOverviewPage'
 import { TemplatesPage } from '@/pages/TemplatesPage'
 import { MessagingSystemsPage } from '@/pages/MessagingSystemsPage'
 import { ConnectPage } from '@/pages/ConnectPage'
+import { ClientsPage } from '@/pages/ClientsPage'
 import { CompaniesPage } from '@/pages/CompaniesPage'
 import { CompanyDetailPage } from '@/pages/CompanyDetailPage'
 import { CompanyNewPage } from '@/pages/CompanyNewPage'
@@ -47,6 +48,7 @@ export function AppRoutes() {
         <Route element={<DashboardLayout />}>
           <Route path={ROUTES.auth.systems} element={<SystemsPage />} />
           <Route path={ROUTES.auth.systemDetail} element={<SystemDetailPage />} />
+          <Route path={ROUTES.auth.clients} element={<ClientsPage />} />
           <Route path={ROUTES.auth.tenants} element={<TenantsPage />} />
           <Route path={ROUTES.auth.users} element={<UsersPage />} />
           <Route path={ROUTES.auth.userDetail} element={<UserDetailPage />} />

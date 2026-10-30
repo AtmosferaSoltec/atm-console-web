@@ -4,6 +4,7 @@ import { TableFooter } from '@/components/common/TableFooter'
 import { Card } from '@/components/ui/card'
 import type { TenantItem, TenantsListProps } from '../types/tenant.types'
 import { EditTenantDialog } from './EditTenantDialog'
+import { TenantClientDialog } from './TenantClientDialog'
 import { TenantSystemsDialog } from './TenantSystemsDialog'
 import { TenantsTable } from './TenantsTable'
 
@@ -19,9 +20,11 @@ export function TenantsList({ tenants, isLoading, error, onChanged }: TenantsLis
   const [status, setStatus] = useState('all')
   const [managingId, setManagingId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [clientId, setClientId] = useState<string | null>(null)
   // Looked up in the list so the dialog sees the fresh systems after a reload.
   const managing = tenants.find((tenant) => tenant.id === managingId) ?? null
   const editing = tenants.find((tenant) => tenant.id === editingId) ?? null
+  const changingClient = tenants.find((tenant) => tenant.id === clientId) ?? null
 
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -29,18 +32,19 @@ export function TenantsList({ tenants, isLoading, error, onChanged }: TenantsLis
       (tenant) =>
         (status === 'all' || tenant.status === status) &&
         (term === '' || tenant.legalName.toLowerCase().includes(term) ||
-          tenant.tradeName.toLowerCase().includes(term) || tenant.ruc.includes(term)),
+          tenant.tradeName.toLowerCase().includes(term) || tenant.clientName.toLowerCase().includes(term) || tenant.ruc.includes(term)),
     )
   }, [tenants, search, status])
 
   return (
     <Card>
-      <ListToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar por razón social o RUC" status={status} onStatusChange={setStatus} />
+      <ListToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar por razón social, cliente o RUC" status={status} onStatusChange={setStatus} />
       <div className="border-t border-slate-100">
-        <TenantsTable tenants={visible} emptyMessage={emptyMessage(isLoading, error, tenants.length)} onEdit={(tenant: TenantItem) => setEditingId(tenant.id)} onManageSystems={(tenant: TenantItem) => setManagingId(tenant.id)} />
+        <TenantsTable tenants={visible} emptyMessage={emptyMessage(isLoading, error, tenants.length)} onEdit={(tenant: TenantItem) => setEditingId(tenant.id)} onManageSystems={(tenant: TenantItem) => setManagingId(tenant.id)} onChangeClient={(tenant: TenantItem) => setClientId(tenant.id)} />
       </div>
       <TableFooter shown={visible.length} total={tenants.length} noun="empresas" />
       <EditTenantDialog tenant={editing} onClose={() => setEditingId(null)} onSaved={onChanged} />
+      <TenantClientDialog tenant={changingClient} onClose={() => setClientId(null)} onSaved={onChanged} />
       <TenantSystemsDialog tenant={managing} onClose={() => setManagingId(null)} onSaved={onChanged} />
     </Card>
   )

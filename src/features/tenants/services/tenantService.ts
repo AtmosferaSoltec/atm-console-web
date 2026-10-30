@@ -16,6 +16,8 @@ function toTenantItem(tenant: TenantResponse): TenantItem {
     phone: tenant.phone,
     email: tenant.email,
     logoFileId: tenant.logo_file_id ?? '',
+    clientId: tenant.client_id,
+    clientName: tenant.client_name,
     status: tenant.status,
     systems: tenant.systems,
     createdAt: tenant.created_at,
@@ -30,7 +32,7 @@ export async function listTenants(signal?: AbortSignal): Promise<TenantItem[]> {
 export async function createTenant(input: CreateTenantInput): Promise<TenantItem> {
   const tenant = await request<TenantResponse>('/v1/admin/tenants', {
     method: 'POST',
-    body: { ruc: input.ruc, legal_name: input.legalName, trade_name: input.tradeName },
+    body: { ruc: input.ruc, legal_name: input.legalName, trade_name: input.tradeName, ...(input.clientId ? { client_id: input.clientId } : {}) },
   })
   return toTenantItem(tenant)
 }
@@ -61,4 +63,10 @@ export async function enableTenantSystem(tenantId: string, systemId: string): Pr
 
 export async function disableTenantSystem(tenantId: string, systemId: string): Promise<void> {
   await request<void>(`/v1/admin/tenants/${tenantId}/systems/${systemId}`, { method: 'DELETE' })
+}
+
+/** Moves the company to another client. */
+export async function setTenantClient(tenantId: string, clientId: string): Promise<TenantItem> {
+  const tenant = await request<TenantResponse>(`/v1/admin/tenants/${tenantId}/client`, { method: 'PUT', body: { client_id: clientId } })
+  return toTenantItem(tenant)
 }

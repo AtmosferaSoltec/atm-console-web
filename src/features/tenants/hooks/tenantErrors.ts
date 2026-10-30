@@ -5,6 +5,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   invalid_ruc: 'El RUC debe tener 11 dígitos.',
   invalid_legal_name: 'La razón social es obligatoria.',
   tenant_not_found: 'No se encontró la empresa.',
+  client_not_found: 'No se encontró el cliente.',
   invalid_ubigeo: 'El ubigeo debe tener 6 dígitos.',
   invalid_email: 'El correo no es válido.',
   invalid_phone: 'El teléfono no es válido.',

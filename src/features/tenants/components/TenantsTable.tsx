@@ -1,4 +1,4 @@
-import { Settings2 } from 'lucide-react'
+import { Pencil, Settings2 } from 'lucide-react'
 import { EmptyRow } from '@/components/common/EmptyRow'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { Badge } from '@/components/ui/badge'
@@ -7,7 +7,7 @@ import { Table, TBody, Td, Th, THead, Tr } from '@/components/ui/table'
 import { formatDate } from '@/utils/format'
 import type { TenantsTableProps } from '../types/tenant.types'
 
-export function TenantsTable({ tenants, emptyMessage, onManageSystems }: TenantsTableProps) {
+export function TenantsTable({ tenants, emptyMessage, onEdit, onManageSystems }: TenantsTableProps) {
   return (
     <Table className="min-w-[820px]">
       <THead>
@@ -17,7 +17,7 @@ export function TenantsTable({ tenants, emptyMessage, onManageSystems }: Tenants
           <Th>Sistemas contratados</Th>
           <Th>Estado</Th>
           <Th>Creada</Th>
-          <Th className="w-10" />
+          <Th className="w-24" />
         </Tr>
       </THead>
       <TBody>
@@ -47,15 +47,20 @@ export function TenantsTable({ tenants, emptyMessage, onManageSystems }: Tenants
             </Td>
             <Td className="text-slate-500">{formatDate(new Date(tenant.createdAt))}</Td>
             <Td>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label={`Gestionar sistemas de ${tenant.displayName}`}
-                title="Gestionar sistemas"
-                onClick={() => onManageSystems(tenant)}
-              >
-                <Settings2 className="size-4" />
-              </Button>
+              <span className="flex justify-end gap-1">
+                <Button variant="ghost" size="icon" aria-label={`Editar datos de ${tenant.displayName}`} title="Editar datos" onClick={() => onEdit(tenant)}>
+                  <Pencil className="size-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Gestionar sistemas de ${tenant.displayName}`}
+                  title="Gestionar sistemas"
+                  onClick={() => onManageSystems(tenant)}
+                >
+                  <Settings2 className="size-4" />
+                </Button>
+              </span>
             </Td>
           </Tr>
         ))}

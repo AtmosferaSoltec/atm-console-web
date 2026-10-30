@@ -3,9 +3,11 @@ import { useState } from 'react'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Button } from '@/components/ui/button'
 import { FilesList, UploadDialog, useStorageNames } from '@/features/storage'
+import { useTenants } from '@/features/tenants'
 
 export function FilesPage() {
-  const names = useStorageNames()
+  const { tenants, isLoading } = useTenants()
+  const names = useStorageNames(tenants, isLoading)
   const [uploading, setUploading] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 

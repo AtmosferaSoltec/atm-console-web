@@ -14,6 +14,17 @@ export interface TenantItem {
   tradeName: string
   /** Trade name, or the legal name when there is none. */
   displayName: string
+  /** Company profile, all optional ('' when not set). Systems read it from the auth API. */
+  address: string
+  department: string
+  province: string
+  district: string
+  /** 6-digit INEI code of the district. */
+  ubigeo: string
+  phone: string
+  email: string
+  /** Id of the logo in the storage API, or '' when there is none. */
+  logoFileId: string
   status: EntityStatus
   systems: TenantSystem[]
   /** ISO 8601 timestamp. */
@@ -26,6 +37,14 @@ export interface TenantResponse {
   legal_name: string
   trade_name: string
   display_name: string
+  address: string
+  department: string
+  province: string
+  district: string
+  ubigeo: string
+  phone: string
+  email: string
+  logo_file_id: string | null
   status: EntityStatus
   systems: TenantSystem[]
   created_at: string
@@ -41,10 +60,36 @@ export interface CreateTenantInput {
   tradeName: string
 }
 
+export interface UpdateTenantInput {
+  legalName: string
+  tradeName: string
+  address: string
+  department: string
+  province: string
+  district: string
+  ubigeo: string
+  phone: string
+  email: string
+  logoFileId: string
+}
+
 export interface TenantsTableProps {
   tenants: TenantItem[]
   emptyMessage: string
+  onEdit: (tenant: TenantItem) => void
   onManageSystems: (tenant: TenantItem) => void
+}
+
+export interface EditTenantDialogProps {
+  tenant: TenantItem | null
+  onClose: () => void
+  onSaved: () => void
+}
+
+export interface EditTenantFormProps {
+  tenant: TenantItem
+  onClose: () => void
+  onSaved: () => void
 }
 
 export interface SystemTenantsTableProps {

@@ -1,10 +1,9 @@
 import { useMemo } from 'react'
-import { useTenants } from '@/features/tenants'
+import type { TenantItem } from '@/features/tenants'
 import type { StorageNames } from '../types/storage.types'
 
-/** Names for the company UUIDs and system codes that the storage API returns. */
-export function useStorageNames(): StorageNames {
-  const { tenants, isLoading } = useTenants()
+/** Names for the company UUIDs and system codes that the storage API returns. The caller owns the tenants query. */
+export function useStorageNames(tenants: TenantItem[], isLoading: boolean): StorageNames {
   return useMemo(() => {
     const companyNames: Record<string, string> = {}
     const systemNames: Record<string, string> = {}

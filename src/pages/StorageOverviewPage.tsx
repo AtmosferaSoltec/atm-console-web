@@ -3,11 +3,13 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { StatCard } from '@/components/common/StatCard'
 import { Card } from '@/components/ui/card'
 import { UsageTable, useStorageNames, useStorageSummary } from '@/features/storage'
+import { useTenants } from '@/features/tenants'
 import { formatBytes, formatNumber } from '@/utils/format'
 
 export function StorageOverviewPage() {
   const { summary, isLoading, error } = useStorageSummary()
-  const { systemNames } = useStorageNames()
+  const { tenants, isLoading: isTenantsLoading } = useTenants()
+  const { systemNames } = useStorageNames(tenants, isTenantsLoading)
   const usage = summary?.usage ?? []
   const systemsInUse = usage.filter((item) => item.scope === 'system').length
   const emptyMessage = isLoading ? 'Cargando uso...' : (error ?? 'Todavía no hay archivos guardados.')

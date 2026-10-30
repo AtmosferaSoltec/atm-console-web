@@ -1,5 +1,5 @@
 import { request } from '@/services/httpClient'
-import type { CreateTenantInput, TenantItem, TenantListResponse, TenantResponse } from '../types/tenant.types'
+import type { CreateTenantInput, TenantItem, TenantListResponse, TenantResponse, UpdateTenantInput } from '../types/tenant.types'
 
 function toTenantItem(tenant: TenantResponse): TenantItem {
   return {
@@ -8,6 +8,14 @@ function toTenantItem(tenant: TenantResponse): TenantItem {
     legalName: tenant.legal_name,
     tradeName: tenant.trade_name,
     displayName: tenant.display_name,
+    address: tenant.address,
+    department: tenant.department,
+    province: tenant.province,
+    district: tenant.district,
+    ubigeo: tenant.ubigeo,
+    phone: tenant.phone,
+    email: tenant.email,
+    logoFileId: tenant.logo_file_id ?? '',
     status: tenant.status,
     systems: tenant.systems,
     createdAt: tenant.created_at,
@@ -23,6 +31,26 @@ export async function createTenant(input: CreateTenantInput): Promise<TenantItem
   const tenant = await request<TenantResponse>('/v1/admin/tenants', {
     method: 'POST',
     body: { ruc: input.ruc, legal_name: input.legalName, trade_name: input.tradeName },
+  })
+  return toTenantItem(tenant)
+}
+
+/** Replaces the whole profile: a field sent empty is cleared. The RUC cannot change. */
+export async function updateTenant(tenantId: string, input: UpdateTenantInput): Promise<TenantItem> {
+  const tenant = await request<TenantResponse>(`/v1/admin/tenants/${tenantId}`, {
+    method: 'PUT',
+    body: {
+      legal_name: input.legalName,
+      trade_name: input.tradeName,
+      address: input.address,
+      department: input.department,
+      province: input.province,
+      district: input.district,
+      ubigeo: input.ubigeo,
+      phone: input.phone,
+      email: input.email,
+      logo_file_id: input.logoFileId,
+    },
   })
   return toTenantItem(tenant)
 }

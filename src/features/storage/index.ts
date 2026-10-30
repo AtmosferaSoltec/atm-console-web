@@ -1,5 +1,7 @@
+export { CompanyLogoField } from './components/CompanyLogoField'
 export { FilesList } from './components/FilesList'
 export { UploadDialog } from './components/UploadDialog'
 export { UsageTable } from './components/UsageTable'
 export { useStorageSummary } from './hooks/useStorage'
 export { useStorageNames } from './hooks/useStorageNames'
+export { deleteFile } from './services/storageService'

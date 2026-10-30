@@ -120,6 +120,15 @@ export interface ImagePreviewDialogProps {
   onClose: () => void
 }
 
+export interface CompanyLogoFieldProps {
+  companyId: string
+  /** Id of the current logo, or '' when there is none. */
+  logoFileId: string
+  /** Called with the id of a newly uploaded logo, or '' when it is removed. */
+  onChange: (logoFileId: string) => void
+  disabled?: boolean
+}
+
 export interface UsageTableProps {
   usage: UsageItem[]
   totalBytes: number

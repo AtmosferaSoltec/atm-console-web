@@ -58,11 +58,6 @@ export function AccessTable({ items, variant, isLoading, error, onChanged }: Acc
                   <Badge tone="violet" dot={false} className="font-mono">
                     {item.role}
                   </Badge>
-                  {item.manageUsers && (
-                    <Badge tone="info" dot={false}>
-                      Dueño
-                    </Badge>
-                  )}
                 </div>
               </Td>
               <Td className="text-slate-500">{formatDate(new Date(item.createdAt))}</Td>

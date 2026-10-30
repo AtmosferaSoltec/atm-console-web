@@ -9,8 +9,6 @@ export interface AccessItem {
   tenantName: string
   /** Free text: each system defines what its roles mean. */
   role: string
-  /** The user is the owner of the tenant in this system and can manage its members. */
-  manageUsers: boolean
   /** ISO 8601 timestamp. */
   createdAt: string
 }
@@ -26,7 +24,6 @@ export interface AccessResponse {
   tenant_id: string
   tenant_name?: string
   role: string
-  manage_users: boolean
   created_at: string
 }
 
@@ -39,7 +36,6 @@ export interface AssignAccessInput {
   systemId: string
   tenantId: string
   role: string
-  manageUsers: boolean
 }
 
 export type AccessTableVariant = 'byUser' | 'bySystem'

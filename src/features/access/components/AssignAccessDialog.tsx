@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { FormField } from '@/components/common/FormField'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog } from '@/components/ui/dialog'
 import { Select } from '@/components/ui/select'
 import { useRoles } from '@/features/roles'
@@ -19,7 +18,6 @@ export function AssignAccessDialog({ open, onClose, onAssigned, userId, systemId
   const [selectedSystem, setSelectedSystem] = useState(systemId ?? '')
   const [selectedTenant, setSelectedTenant] = useState('')
   const [role, setRole] = useState('')
-  const [manageUsers, setManageUsers] = useState(false)
   const { assign, isSaving, error, clearError } = useAssignAccess()
 
   const { roles, isLoading: rolesLoading } = useRoles(selectedSystem)
@@ -37,7 +35,6 @@ export function AssignAccessDialog({ open, onClose, onAssigned, userId, systemId
     setSelectedSystem(systemId ?? '')
     setSelectedTenant('')
     setRole('')
-    setManageUsers(false)
     clearError()
     onClose()
   }
@@ -45,7 +42,7 @@ export function AssignAccessDialog({ open, onClose, onAssigned, userId, systemId
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
     if (!canSubmit) return
-    if (await assign({ userId: selectedUser, systemId: selectedSystem, tenantId: selectedTenant, role: role.trim(), manageUsers })) {
+    if (await assign({ userId: selectedUser, systemId: selectedSystem, tenantId: selectedTenant, role: role.trim() })) {
       onAssigned()
       handleClose()
     }
@@ -117,12 +114,6 @@ export function AssignAccessDialog({ open, onClose, onAssigned, userId, systemId
             options={roles.map((item) => ({ value: item.name, label: item.name }))}
           />
         </FormField>
-        <Checkbox
-          label="Dueño de la empresa en este sistema"
-          description="Podrá gestionar a los miembros de su propia empresa."
-          checked={manageUsers}
-          onChange={(event) => setManageUsers(event.target.checked)}
-        />
         {error && (
           <p role="alert" className="text-sm text-red-600">
             {error}

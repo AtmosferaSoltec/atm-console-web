@@ -12,7 +12,6 @@ function toAccessItem(access: AccessResponse): AccessItem {
     tenantId: access.tenant_id,
     tenantName: access.tenant_name ?? '',
     role: access.role,
-    manageUsers: access.manage_users,
     createdAt: access.created_at,
   }
 }
@@ -41,7 +40,6 @@ export async function assignAccess(input: AssignAccessInput): Promise<void> {
       system_id: input.systemId,
       tenant_id: input.tenantId,
       role: input.role,
-      manage_users: input.manageUsers,
     },
   })
 }

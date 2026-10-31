@@ -47,17 +47,7 @@ function SystemTabs({ system }: { system: SystemItem }) {
         </TabsContent>
 
         <TabsContent value="roles">
-          <RolesTab
-            systemId={system.id}
-            systemName={system.name}
-            roles={roles.roles}
-            isLoading={roles.isLoading}
-            error={roles.error}
-            onChanged={() => {
-              roles.reload()
-              access.reload()
-            }}
-          />
+          <RolesTab systemName={system.name} roles={roles.roles} isLoading={roles.isLoading} error={roles.error} />
         </TabsContent>
 
         <TabsContent value="tenants">

@@ -9,23 +9,26 @@ export interface BranchResponse {
 
 export interface GymResponse {
   id: string
+  group_id: string
   auth_tenant_id: string
+  auth_client_id: string
   /** Null or empty while the company has no RUC. */
   ruc: string | null
   name: string
   brand_color: string
+  /** Optional modules switched on for the gym. */
+  features?: string[]
   branches: BranchResponse[]
 }
 
-export interface PulsoClientResponse {
+export interface PulsoGroupResponse {
   id: string
-  auth_client_id: string
   name: string
   gyms: GymResponse[]
 }
 
-export interface PulsoClientListResponse {
-  data: PulsoClientResponse[]
+export interface PulsoGroupListResponse {
+  data: PulsoGroupResponse[]
 }
 
 export interface Branch {
@@ -36,19 +39,23 @@ export interface Branch {
 
 export interface Gym {
   id: string
+  groupId: string
   /** The company in the auth API this gym comes from. */
   tenantId: string
+  /** The client in the auth API that owns that company. */
+  authClientId: string
   /** '' when the company has no RUC. */
   ruc: string
   name: string
   brandColor: string
+  /** Codes of the optional modules switched on: products, body_tracking, kiosk. */
+  features: string[]
   branches: Branch[]
 }
 
-export interface PulsoClient {
+/** An internal label that bundles related gyms. It is not a user. */
+export interface PulsoGroup {
   id: string
-  /** The client in the auth API. */
-  authClientId: string
   name: string
   gyms: Gym[]
 }
@@ -77,6 +84,9 @@ export interface NewMemberInput {
 
 export interface NewGymInput {
   systemId: string
+  /** The group the gym must end up in. */
+  groupId: string
+  /** The client in the auth API whose company becomes the gym. */
   authClientId: string
   name: string
 }
@@ -92,9 +102,25 @@ export interface BranchDialogProps {
 }
 
 export interface NewGymDialogProps {
-  /** The client that receives the gym, or null when the dialog is closed. */
-  client: PulsoClient | null
+  /** The group that receives the gym, or null when the dialog is closed. */
+  group: PulsoGroup | null
   systemId: string | null
+  onClose: () => void
+  onSaved: () => void
+}
+
+/** Creates a group when `group` is null, and renames it otherwise. */
+export interface GroupDialogProps {
+  open: boolean
+  group: PulsoGroup | null
+  onClose: () => void
+  onSaved: () => void
+}
+
+export interface MoveGymDialogProps {
+  /** The gym being moved, or null when the dialog is closed. */
+  gym: Gym | null
+  groups: PulsoGroup[]
   onClose: () => void
   onSaved: () => void
 }
@@ -112,12 +138,18 @@ export interface GymColorFieldProps {
   onSaved: () => void
 }
 
+export interface GymFeaturesFieldProps {
+  gym: Gym
+  onSaved: () => void
+}
+
 export interface GymPanelProps {
   gym: Gym
   /** The company behind the gym, for its profile dialog; undefined while companies load. */
   tenant: TenantItem | undefined
   members: TeamMember[]
   onEditCompany: (tenant: TenantItem) => void
+  onMoveGym: (gym: Gym) => void
   onAddBranch: (gym: Gym) => void
   onEditBranch: (branch: Branch) => void
   onDeleteBranch: (branch: Branch) => void
@@ -126,8 +158,8 @@ export interface GymPanelProps {
   onChanged: () => void
 }
 
-export interface PulsoClientsListProps {
-  clients: PulsoClient[]
+export interface PulsoGroupsListProps {
+  groups: PulsoGroup[]
   team: PulsoTeam
   isLoading: boolean
   error: string | null

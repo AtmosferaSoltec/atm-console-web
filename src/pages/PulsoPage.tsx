@@ -2,11 +2,10 @@ import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Button } from '@/components/ui/button'
-import { ClientDialog } from '@/features/clients'
-import { PulsoClientsList, usePulsoClients, usePulsoTeam } from '@/features/pulso'
+import { GroupDialog, PulsoGroupsList, usePulsoGroups, usePulsoTeam } from '@/features/pulso'
 
 export function PulsoPage() {
-  const { clients, isLoading, error, reload } = usePulsoClients()
+  const { groups, isLoading, error, reload } = usePulsoGroups()
   const { team, isLoading: teamLoading, reload: reloadTeam } = usePulsoTeam()
   const [creating, setCreating] = useState(false)
 
@@ -17,12 +16,12 @@ export function PulsoPage() {
         actions={
           <Button onClick={() => setCreating(true)}>
             <Plus className="size-4" />
-            Nuevo cliente
+            Nuevo grupo
           </Button>
         }
       />
-      <PulsoClientsList clients={clients} team={team} isLoading={isLoading || teamLoading} error={error} onChanged={reload} onTeamChanged={reloadTeam} />
-      <ClientDialog open={creating} client={null} onClose={() => setCreating(false)} onSaved={reload} />
+      <PulsoGroupsList groups={groups} team={team} isLoading={isLoading || teamLoading} error={error} onChanged={reload} onTeamChanged={reloadTeam} />
+      <GroupDialog open={creating} group={null} onClose={() => setCreating(false)} onSaved={reload} />
     </>
   )
 }

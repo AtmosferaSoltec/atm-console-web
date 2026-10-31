@@ -18,5 +18,9 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Dev-only hint (fast refresh); the badge files export helpers next to components. Kept visible as a warning.
+      'react-refresh/only-export-components': 'warn',
+    },
   },
 ])

@@ -7,7 +7,7 @@ export interface AccessItem {
   systemName: string
   tenantId: string
   tenantName: string
-  /** Free text: each system defines what its roles mean. */
+  /** One of the fixed roles of the system; the API refuses any other. */
   role: string
   /** ISO 8601 timestamp. */
   createdAt: string

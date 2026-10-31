@@ -89,14 +89,16 @@ The console has no configuration or secrets on the server.
 
 ## Systems and Pulso
 
+- **Roles are fixed too.** Each system's roles are declared in the auth API catalog; the console lists them (read-only tab) and assigns them to users. The API refuses any role outside the catalog (`unknown_role`).
 - **Systems are not created here.** `atm-auth-api` seeds the catalog of systems (and their roles) from code at startup; the console only lists them, manages their credential and session policy, enables them per company and assigns users. To add a system, add it to that catalog in the auth API.
-- **Pulso** (`src/features/pulso`) is the one place to configure everything per system for Pulso. A client is an auth-api client; a gym is a company of that client with the `pulso` system enabled. From the page the superadmin can:
-  - create clients ("Nuevo cliente"; reuses `features/clients`);
-  - create a gym inside a client ("Nuevo gimnasio"): a company with only a name (no RUC) with Pulso enabled. Pulso creates the gym and its main branch itself the next time it lists clients;
-  - set the gym's colour (`PATCH /pulso-api/api/v1/admin/gyms/{id}`) and open its company profile (name, logo) in the usual company dialog;
+- **Pulso** (`src/features/pulso`) is the one place to configure everything per system for Pulso. Pulso's model is Group > Gym > Branch (Grupo > Gimnasio > Sede): a group is an internal label that bundles related gyms (not a user); a gym is a company of the auth API with the `pulso` system enabled. From the page the superadmin can:
+  - create, rename and delete groups (`/admin/groups`; deleting a group that still has gyms answers 409 `GROUP_IN_USE`);
+  - create a gym inside a group ("Nuevo gimnasio"): a company with only a name (no RUC) of an auth client, with Pulso enabled. Pulso records the gym and its main branch the next time it lists groups and places it in the group of another gym of the same auth client; the console then moves it to the chosen group;
+  - move a gym to another group (`PATCH /pulso-api/api/v1/admin/gyms/{id}` with `group_id`);
+  - set the gym's colour (same endpoint, `brand_color`) and open its company profile (name, logo) in the usual company dialog;
   - create, rename and delete its branches (admins of a gym can never create branches);
   - manage its team: people with access to the company in the `pulso` system. Adding a person creates their account by DNI when it does not exist and gives them access with role `admin` (always with `manage_users`, so they can create their own receptionists) or `receptionist`; the icon removes the access, never the account.
-  Prices are agreed with the client and are not recorded in any system.
+  Prices are agreed with the customer and are not recorded in any system.
 - The RUC of a company is optional everywhere in the console (a gym starts without one).
 - The console reaches the Pulso API on its own origin under `/pulso-api/` (Vite proxy in development, port 3001; host nginx in production, see `deploy/nginx-host-pulso-api.conf.example`, loopback port 3081). Override with `VITE_PULSO_API_URL` if needed. The Pulso API must accept the superadmin token of the auth API on `/api/v1/admin/*`.
 

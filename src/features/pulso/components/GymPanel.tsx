@@ -1,11 +1,12 @@
-import { Building2, Pencil, Plus, Trash2, UserMinus, UserPlus } from 'lucide-react'
+import { ArrowRightLeft, Building2, Pencil, Plus, Trash2, UserMinus, UserPlus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { roleLabel } from '../services/roleLabels'
 import type { GymPanelProps } from '../types/pulso.types'
 import { GymColorField } from './GymColorField'
+import { GymFeaturesField } from './GymFeaturesField'
 
-export function GymPanel({ gym, tenant, members, onEditCompany, onAddBranch, onEditBranch, onDeleteBranch, onAddMember, onRemoveMember, onChanged }: GymPanelProps) {
+export function GymPanel({ gym, tenant, members, onEditCompany, onMoveGym, onAddBranch, onEditBranch, onDeleteBranch, onAddMember, onRemoveMember, onChanged }: GymPanelProps) {
   return (
     <div className="border-b border-slate-100 px-5 py-4 last:border-b-0">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -15,6 +16,9 @@ export function GymPanel({ gym, tenant, members, onEditCompany, onAddBranch, onE
         </div>
         <div className="flex items-center gap-1">
           <GymColorField key={gym.brandColor} gym={gym} onSaved={onChanged} />
+          <Button variant="ghost" size="icon" aria-label={`Mover ${gym.name} a otro grupo`} title="Mover a otro grupo" onClick={() => onMoveGym(gym)}>
+            <ArrowRightLeft className="size-4" />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -26,6 +30,10 @@ export function GymPanel({ gym, tenant, members, onEditCompany, onAddBranch, onE
             <Building2 className="size-4" />
           </Button>
         </div>
+      </div>
+
+      <div className="mt-3">
+        <GymFeaturesField key={gym.features.join(',')} gym={gym} onSaved={onChanged} />
       </div>
 
       <div className="mt-3 grid gap-4 lg:grid-cols-2">

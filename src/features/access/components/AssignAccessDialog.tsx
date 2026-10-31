@@ -102,8 +102,8 @@ export function AssignAccessDialog({ open, onClose, onAssigned, userId, systemId
           htmlFor="access-role"
           hint={
             selectedSystem && !rolesLoading && roles.length === 0
-              ? 'Este sistema todavía no tiene roles. Créalos en su detalle, en la pestaña Roles.'
-              : 'Los roles se crean en el detalle de cada sistema.'
+              ? 'Este sistema no tiene roles disponibles.'
+              : 'Solo se pueden asignar los roles definidos para el sistema.'
           }
         >
           <Select
@@ -111,7 +111,7 @@ export function AssignAccessDialog({ open, onClose, onAssigned, userId, systemId
             value={role}
             onValueChange={setRole}
             placeholder={!selectedSystem ? 'Primero elige un sistema' : rolesLoading ? 'Cargando roles...' : 'Elige un rol'}
-            options={roles.map((item) => ({ value: item.name, label: item.name }))}
+            options={roles.filter((item) => item.active).map((item) => ({ value: item.name, label: item.name }))}
           />
         </FormField>
         {error && (

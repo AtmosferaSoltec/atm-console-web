@@ -48,7 +48,7 @@ export interface Gym {
   ruc: string
   name: string
   brandColor: string
-  /** Codes of the optional modules switched on: products, body_tracking, kiosk. */
+  /** Codes of the optional modules switched on: sales, body_tracking, kiosk. */
   features: string[]
   branches: Branch[]
 }

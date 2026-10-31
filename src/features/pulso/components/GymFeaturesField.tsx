@@ -4,7 +4,7 @@ import type { GymFeaturesFieldProps } from '../types/pulso.types'
 
 /** The optional modules Pulso offers, in the order the API lists them. Only the platform switches them on. */
 const MODULES = [
-  { code: 'products', label: 'Productos y fiados' },
+  { code: 'sales', label: 'Ventas' },
   { code: 'body_tracking', label: 'Medidas y rutinas' },
   { code: 'kiosk', label: 'Quiosco de acceso' },
 ] as const

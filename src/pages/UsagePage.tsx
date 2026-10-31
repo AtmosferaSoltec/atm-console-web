@@ -7,8 +7,8 @@ import { MonthNavigation, UsageTable, useUsage } from '@/features/usage'
 import { cn } from '@/utils/cn'
 
 export function UsagePage() {
-  const rows = useUsage()
   const [month, setMonth] = useState(() => new Date())
+  const { rows, isLoading, error } = useUsage(month)
   const totalUsed = rows.reduce((sum, row) => sum + row.used, 0)
   const nearLimit = rows.filter((row) => row.used >= row.limit * 0.8).length
 
@@ -32,7 +32,7 @@ export function UsagePage() {
       </div>
 
       <Card>
-        <UsageTable rows={rows} />
+        <UsageTable rows={rows} emptyMessage={isLoading ? 'Cargando consumo...' : (error ?? undefined)} />
       </Card>
 
       <p className="mt-3 text-xs text-slate-500">

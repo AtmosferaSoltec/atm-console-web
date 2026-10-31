@@ -142,3 +142,17 @@ export async function createApiKey(companyId: string, name: string): Promise<str
 export async function revokeApiKey(keyId: string): Promise<void> {
   await request<void>(`${PATH}/api-keys/${keyId}`, { ...BASE, method: 'DELETE' })
 }
+
+/** The systems that may issue for the company with their service token, without an API key. */
+export async function listCompanySystems(companyId: string, signal?: AbortSignal): Promise<string[]> {
+  const systems = await request<Array<{ systemCode: string }>>(`${PATH}/companies/${companyId}/systems`, { ...BASE, signal })
+  return systems.map((system) => system.systemCode)
+}
+
+export async function grantCompanySystem(companyId: string, systemCode: string): Promise<void> {
+  await request<unknown>(`${PATH}/companies/${companyId}/systems/${systemCode}`, { ...BASE, method: 'PUT' })
+}
+
+export async function revokeCompanySystem(companyId: string, systemCode: string): Promise<void> {
+  await request<void>(`${PATH}/companies/${companyId}/systems/${systemCode}`, { ...BASE, method: 'DELETE' })
+}

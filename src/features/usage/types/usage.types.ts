@@ -11,8 +11,24 @@ export interface CompanyUsage {
   limit: number
 }
 
+/** The usage of a month as the API sends it. */
+export interface UsageResponse {
+  month: string
+  companies: Array<{
+    company: { id: string; name: string; taxId: string }
+    isActive: boolean
+    limit: number
+    used: number
+    facturas: number
+    boletas: number
+    greRemitente: number
+    greTransportista: number
+  }>
+}
+
 export interface UsageTableProps {
   rows: CompanyUsage[]
+  emptyMessage?: string
 }
 
 export interface MonthNavigationProps {

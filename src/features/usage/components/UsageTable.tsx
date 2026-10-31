@@ -13,7 +13,7 @@ function RemainingBadge({ row }: { row: CompanyUsage }) {
   return <Badge tone="success">{remaining} disponibles</Badge>
 }
 
-export function UsageTable({ rows }: UsageTableProps) {
+export function UsageTable({ rows, emptyMessage = 'No hay empresas activas.' }: UsageTableProps) {
   return (
     <Table className="min-w-[1000px]">
       <THead>
@@ -29,7 +29,7 @@ export function UsageTable({ rows }: UsageTableProps) {
         </Tr>
       </THead>
       <TBody>
-        {rows.length === 0 && <EmptyRow colSpan={8} message="No hay empresas activas." />}
+        {rows.length === 0 && <EmptyRow colSpan={8} message={emptyMessage} />}
         {rows.map((row) => (
           <Tr key={row.companyId}>
             <Td className="min-w-52">

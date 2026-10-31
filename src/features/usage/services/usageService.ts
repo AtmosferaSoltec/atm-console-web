@@ -1,14 +1,24 @@
-import type { CompanyUsage } from '../types/usage.types'
+import { NUBEFACT_API_BASE_URL } from '@/config/env'
+import { request } from '@/services/httpClient'
+import type { CompanyUsage, UsageResponse } from '../types/usage.types'
 
-const USAGE: CompanyUsage[] = [
-  { companyId: 'co1', name: 'Olympus Courier S.A.C.', ruc: '20601234567', isActive: true, invoices: 410, receipts: 432, greSender: 391, greCarrier: 0, used: 1233, limit: 1500 },
-  { companyId: 'co2', name: 'Lavendimia E.I.R.L.', ruc: '20609876543', isActive: true, invoices: 60, receipts: 452, greSender: 0, greCarrier: 0, used: 512, limit: 600 },
-  { companyId: 'co3', name: 'Hotel Atmosfera S.A.C.', ruc: '20555123987', isActive: true, invoices: 0, receipts: 0, greSender: 0, greCarrier: 0, used: 0, limit: 300 },
-  { companyId: 'co4', name: 'Agro Norte S.A.', ruc: '20487654321', isActive: true, invoices: 391, receipts: 0, greSender: 40, greCarrier: 48, used: 479, limit: 400 },
-  { companyId: 'co5', name: 'Turismo Sur S.A.C.', ruc: '20512345678', isActive: false, invoices: 0, receipts: 0, greSender: 0, greCarrier: 0, used: 0, limit: 200 },
-]
+/** The month of a usage query, as the API names it: YYYY-MM. */
+export function usageMonthKey(month: Date): string {
+  return `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`
+}
 
-/** Hardcoded sample data. Replace with real API calls when the console is wired up. */
-export function getUsage(): CompanyUsage[] {
-  return USAGE
+export async function getUsage(monthKey: string, signal?: AbortSignal): Promise<CompanyUsage[]> {
+  const usage = await request<UsageResponse>(`/admin/stats/usage?month=${monthKey}`, { baseUrl: NUBEFACT_API_BASE_URL, signal })
+  return usage.companies.map((row) => ({
+    companyId: row.company.id,
+    name: row.company.name,
+    ruc: row.company.taxId,
+    isActive: row.isActive,
+    invoices: row.facturas,
+    receipts: row.boletas,
+    greSender: row.greRemitente,
+    greCarrier: row.greTransportista,
+    used: row.used,
+    limit: row.limit,
+  }))
 }

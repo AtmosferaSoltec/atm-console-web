@@ -8,10 +8,17 @@ import { TableFooter } from '@/components/common/TableFooter'
 import { Card } from '@/components/ui/card'
 import { Table, TBody, Td, Th, THead, Tr } from '@/components/ui/table'
 import { companyPath } from '@/config/routes'
+import { formatDate } from '@/utils/format'
 import type { CompaniesListProps } from '../types/company.types'
 import { TestBadge } from './TestBadge'
 
-export function CompaniesList({ companies }: CompaniesListProps) {
+function emptyMessage(isLoading: boolean, error: string | null, total: number): string {
+  if (isLoading) return 'Cargando empresas...'
+  if (error) return error
+  return total === 0 ? 'Todavía no hay empresas emisoras.' : 'No hay empresas con esos filtros.'
+}
+
+export function CompaniesList({ companies, isLoading, error }: CompaniesListProps) {
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('all')
 
@@ -39,7 +46,7 @@ export function CompaniesList({ companies }: CompaniesListProps) {
             </Tr>
           </THead>
           <TBody>
-            {visible.length === 0 && <EmptyRow colSpan={6} message="No hay empresas con esos filtros." />}
+            {visible.length === 0 && <EmptyRow colSpan={6} message={emptyMessage(isLoading, error, companies.length)} />}
             {visible.map((company) => (
               <Tr key={company.id}>
                 <Td className="font-mono text-slate-600">{company.ruc}</Td>
@@ -49,11 +56,11 @@ export function CompaniesList({ companies }: CompaniesListProps) {
                     {company.isTest && <TestBadge />}
                   </Link>
                 </Td>
-                <Td className="font-mono text-slate-500">••••{company.nubefactTokenLast4}</Td>
+                <Td className="font-mono text-slate-500">{company.nubefactTokenLast4 ? `••••${company.nubefactTokenLast4}` : <span className="text-slate-400">Sin token</span>}</Td>
                 <Td>
                   <StatusBadge status={company.isActive ? 'active' : 'disabled'} />
                 </Td>
-                <Td className="text-slate-500">{company.createdAt}</Td>
+                <Td className="text-slate-500">{formatDate(new Date(company.createdAt))}</Td>
                 <Td>
                   <Link to={companyPath(company.id)} aria-label={`Ver ${company.name}`} className="text-slate-300 transition hover:text-slate-600">
                     <ChevronRight className="size-4" />

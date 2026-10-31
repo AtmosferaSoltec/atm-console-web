@@ -5,7 +5,7 @@ import { ROUTES } from '@/config/routes'
 import { CompaniesList, useCompanies } from '@/features/companies'
 
 export function CompaniesPage() {
-  const companies = useCompanies()
+  const { items, isLoading, error } = useCompanies()
 
   return (
     <>
@@ -19,7 +19,7 @@ export function CompaniesPage() {
           </Link>
         }
       />
-      <CompaniesList companies={companies} />
+      <CompaniesList companies={items} isLoading={isLoading} error={error} />
     </>
   )
 }

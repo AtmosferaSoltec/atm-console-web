@@ -1,4 +1,5 @@
 import { RefreshCw } from 'lucide-react'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { BackLink } from '@/components/common/BackLink'
 import { NotFoundCard } from '@/components/common/NotFoundCard'
@@ -7,20 +8,39 @@ import { Button } from '@/components/ui/button'
 import { DOCUMENT_TYPE_LABELS } from '@/config/labels'
 import { companyPath, ROUTES } from '@/config/routes'
 import { TestBadge } from '@/features/companies'
-import { DocumentStatusBadge, GuideDetail, useGuide } from '@/features/documents'
+import { companyErrorMessage } from '@/features/companies'
+import { DocumentStatusBadge, GuideDetail, recheckGuide, useGuide } from '@/features/documents'
 import { formatDocumentNumber } from '@/utils/format'
 
 const RECHECKABLE = ['SUBMITTED', 'NEEDS_REVIEW']
 
 export function ShippingGuideDetailPage() {
   const { guideId } = useParams()
-  const guide = useGuide(guideId)
+  const { guide, isLoading, error, reload } = useGuide(guideId)
+  const [rechecking, setRechecking] = useState(false)
+  const [recheckError, setRecheckError] = useState<string | null>(null)
+
+  const recheck = async () => {
+    if (!guideId) return
+    setRechecking(true)
+    setRecheckError(null)
+    try {
+      await recheckGuide(guideId)
+      reload()
+    } catch (caught) {
+      setRecheckError(companyErrorMessage(caught, 'No se pudo reverificar en SUNAT.'))
+    } finally {
+      setRechecking(false)
+    }
+  }
 
   return (
     <>
       <BackLink to={ROUTES.billing.shippingGuides} label="Guías de remisión" />
-      {!guide ? (
-        <NotFoundCard message="No encontramos esta guía." />
+      {isLoading ? (
+        <p className="py-10 text-center text-sm text-slate-500">Cargando guía...</p>
+      ) : !guide ? (
+        <NotFoundCard message={error ?? 'No encontramos esta guía.'} />
       ) : (
         <>
           <PageHeader
@@ -36,13 +56,18 @@ export function ShippingGuideDetailPage() {
             }
             actions={
               RECHECKABLE.includes(guide.status) && (
-                <Button variant="outline">
+                <Button variant="outline" onClick={recheck} disabled={rechecking}>
                   <RefreshCw className="size-4" />
-                  Reverificar en SUNAT
+                  {rechecking ? 'Reverificando...' : 'Reverificar en SUNAT'}
                 </Button>
               )
             }
           />
+          {recheckError && (
+            <p role="alert" className="mb-4 text-sm text-red-600">
+              {recheckError}
+            </p>
+          )}
           <GuideDetail guide={guide} />
         </>
       )}

@@ -1,39 +1,144 @@
-import type { Company, CompanyApiKey, CompanySeries } from '../types/company.types'
+import { NUBEFACT_API_BASE_URL } from '@/config/env'
+import { request } from '@/services/httpClient'
+import type {
+  ApiKeyResponse,
+  Company,
+  CompanyApiKey,
+  CompanyPageResponse,
+  CompanyResponse,
+  CompanySeries,
+  CreateCompanyInput,
+  CreateSeriesInput,
+  NubefactTestResult,
+  SeriesResponse,
+  SwitchToProductionInput,
+  UpdateCompanyInput,
+  UpdateSeriesInput,
+} from '../types/company.types'
 
-const COMPANIES: Company[] = [
-  { id: 'co1', ruc: '20601234567', name: 'Olympus Courier S.A.C.', isActive: true, isTest: false, nubefactEmail: 'facturacion@olympuscourier.pe', nubefactUrl: 'https://api.nubefact.com/api/v1/8f3a1c52-7d94-4b0e-a6c1', nubefactTokenLast4: 'a91f', monthlyDocumentLimit: 1500, invoicesThisMonth: 842, guidesThisMonth: 391, activeApiKeys: 2, seriesCount: 4, createdAt: '14 ene 2026' },
-  { id: 'co2', ruc: '20609876543', name: 'Lavendimia E.I.R.L.', isActive: true, isTest: false, nubefactEmail: null, nubefactUrl: 'https://api.nubefact.com/api/v1/2b7d9e10-c3a5-4f68-91d2', nubefactTokenLast4: '3c7e', monthlyDocumentLimit: 600, invoicesThisMonth: 512, guidesThisMonth: 0, activeApiKeys: 1, seriesCount: 3, createdAt: '14 ene 2026' },
-  { id: 'co3', ruc: '20555123987', name: 'Hotel Atmosfera S.A.C.', isActive: true, isTest: true, nubefactEmail: 'admin@hotelatmosfera.pe', nubefactUrl: 'https://api.nubefact.com/api/v1/demo-5e8a02', nubefactTokenLast4: '0d42', monthlyDocumentLimit: 300, invoicesThisMonth: 12, guidesThisMonth: 0, activeApiKeys: 1, seriesCount: 2, createdAt: '02 feb 2026' },
-  { id: 'co4', ruc: '20487654321', name: 'Agro Norte S.A.', isActive: true, isTest: false, nubefactEmail: null, nubefactUrl: 'https://api.nubefact.com/api/v1/c4d6e8f0-1a3b-4c5d-8e7f', nubefactTokenLast4: 'b5e0', monthlyDocumentLimit: 400, invoicesThisMonth: 391, guidesThisMonth: 88, activeApiKeys: 1, seriesCount: 3, createdAt: '18 feb 2026' },
-  { id: 'co5', ruc: '20512345678', name: 'Turismo Sur S.A.C.', isActive: false, isTest: false, nubefactEmail: null, nubefactUrl: 'https://api.nubefact.com/api/v1/7a9b1c3d-5e7f-4a2b-9c8d', nubefactTokenLast4: '77aa', monthlyDocumentLimit: 200, invoicesThisMonth: 0, guidesThisMonth: 0, activeApiKeys: 0, seriesCount: 2, createdAt: '05 mar 2026' },
-]
+const PATH = '/admin'
+const BASE = { baseUrl: NUBEFACT_API_BASE_URL }
+/** The API pages its lists; there are few companies, so one big page is the whole list. */
+const ALL = 'pageSize=100'
 
-const SERIES: CompanySeries[] = [
-  { id: 'se1', companyId: 'co1', documentType: 'FACTURA', series: 'F001', lastNumber: 482, isDefault: true, isActive: true },
-  { id: 'se2', companyId: 'co1', documentType: 'BOLETA', series: 'B001', lastNumber: 1203, isDefault: true, isActive: true },
-  { id: 'se3', companyId: 'co1', documentType: 'GRE_REMITENTE', series: 'T001', lastNumber: 97, isDefault: true, isActive: true },
-  { id: 'se4', companyId: 'co1', documentType: 'FACTURA', series: 'F002', lastNumber: 14, isDefault: false, isActive: false },
-]
-
-const KEYS: CompanyApiKey[] = [
-  { id: 'k1', companyId: 'co1', label: 'Olympus producción', prefix: 'atm_nbf_9d2c', createdAt: '14 ene 2026', lastUsedAt: 'hace 3 min', isActive: true },
-  { id: 'k2', companyId: 'co1', label: 'Olympus pruebas', prefix: 'atm_nbf_41af', createdAt: '20 ene 2026', lastUsedAt: 'hace 4 días', isActive: true },
-  { id: 'k3', companyId: 'co1', label: 'Integración anterior', prefix: 'atm_nbf_c07e', createdAt: '14 ene 2026', lastUsedAt: null, isActive: false },
-]
-
-/** Hardcoded sample data. Replace with real API calls when the console is wired up. */
-export function getCompanies(): Company[] {
-  return COMPANIES
+function toCompany(company: CompanyResponse): Company {
+  return {
+    id: company.id,
+    ruc: company.taxId,
+    name: company.name,
+    isActive: company.isActive,
+    isTest: company.nubefactMode === 'TEST',
+    nubefactUrl: company.nubefactUrl,
+    nubefactEmail: company.nubefactEmail,
+    nubefactTokenLast4: company.nubefactTokenLast4 ?? '',
+    monthlyDocumentLimit: company.monthlyDocumentLimit,
+    createdAt: company.createdAt,
+    counts: company.counts ?? null,
+  }
 }
 
-export function getCompanyById(companyId: string): Company | undefined {
-  return COMPANIES.find((company) => company.id === companyId)
+function toSeries(series: SeriesResponse): CompanySeries {
+  return {
+    id: series.id,
+    companyId: series.companyId,
+    documentType: series.documentType,
+    series: series.series,
+    lastNumber: series.lastNumber,
+    isDefault: series.isDefault,
+    isActive: series.isActive,
+  }
 }
 
-export function getSeries(companyId: string): CompanySeries[] {
-  return SERIES.filter((item) => item.companyId === companyId)
+function toApiKey(key: ApiKeyResponse): CompanyApiKey {
+  return {
+    id: key.id,
+    label: key.name,
+    prefix: key.prefix,
+    createdAt: key.createdAt,
+    lastUsedAt: key.lastUsedAt,
+    isActive: key.revokedAt === null,
+    documentCount: key.documentCount,
+  }
 }
 
-export function getApiKeys(companyId: string): CompanyApiKey[] {
-  return KEYS.filter((key) => key.companyId === companyId)
+export async function listCompanies(signal?: AbortSignal): Promise<Company[]> {
+  const { data } = await request<CompanyPageResponse>(`${PATH}/companies?${ALL}`, { ...BASE, signal })
+  return data.map(toCompany)
+}
+
+export async function getCompany(companyId: string, signal?: AbortSignal): Promise<Company> {
+  return toCompany(await request<CompanyResponse>(`${PATH}/companies/${companyId}`, { ...BASE, signal }))
+}
+
+export async function createCompany(input: CreateCompanyInput): Promise<Company> {
+  const company = await request<CompanyResponse>(`${PATH}/companies`, {
+    ...BASE,
+    method: 'POST',
+    body: {
+      taxId: input.ruc,
+      name: input.name,
+      nubefactUrl: input.nubefactUrl,
+      nubefactToken: input.nubefactToken,
+      nubefactMode: input.nubefactMode,
+      ...(input.nubefactEmail ? { nubefactEmail: input.nubefactEmail } : {}),
+    },
+  })
+  return toCompany(company)
+}
+
+export async function updateCompany(companyId: string, input: UpdateCompanyInput): Promise<Company> {
+  const { nubefactEmail, ...rest } = input
+  const company = await request<CompanyResponse>(`${PATH}/companies/${companyId}`, {
+    ...BASE,
+    method: 'PATCH',
+    // The API clears the email with null.
+    body: { ...rest, ...(nubefactEmail === undefined ? {} : { nubefactEmail: nubefactEmail === '' ? null : nubefactEmail }) },
+  })
+  return toCompany(company)
+}
+
+export async function replaceNubefactToken(companyId: string, nubefactToken: string): Promise<Company> {
+  return toCompany(await request<CompanyResponse>(`${PATH}/companies/${companyId}/nubefact-token`, { ...BASE, method: 'PUT', body: { nubefactToken } }))
+}
+
+/** Only from the demo account: there is no way back. */
+export async function switchToProduction(companyId: string, input: SwitchToProductionInput): Promise<Company> {
+  const company = await request<CompanyResponse>(`${PATH}/companies/${companyId}/nubefact-production`, {
+    ...BASE,
+    method: 'POST',
+    body: { nubefactUrl: input.nubefactUrl, nubefactToken: input.nubefactToken, ...(input.nubefactEmail ? { nubefactEmail: input.nubefactEmail } : {}) },
+  })
+  return toCompany(company)
+}
+
+export async function testNubefactConnection(companyId: string): Promise<NubefactTestResult> {
+  return request<NubefactTestResult>(`${PATH}/companies/${companyId}/nubefact-test`, { ...BASE, method: 'POST' })
+}
+
+export async function listSeries(companyId: string, signal?: AbortSignal): Promise<CompanySeries[]> {
+  const series = await request<SeriesResponse[]>(`${PATH}/companies/${companyId}/series`, { ...BASE, signal })
+  return series.map(toSeries)
+}
+
+export async function createSeries(companyId: string, input: CreateSeriesInput): Promise<CompanySeries> {
+  return toSeries(await request<SeriesResponse>(`${PATH}/companies/${companyId}/series`, { ...BASE, method: 'POST', body: input }))
+}
+
+export async function updateSeries(seriesId: string, input: UpdateSeriesInput): Promise<CompanySeries> {
+  return toSeries(await request<SeriesResponse>(`${PATH}/series/${seriesId}`, { ...BASE, method: 'PATCH', body: input }))
+}
+
+export async function listApiKeys(companyId: string, signal?: AbortSignal): Promise<CompanyApiKey[]> {
+  const keys = await request<ApiKeyResponse[]>(`${PATH}/companies/${companyId}/api-keys`, { ...BASE, signal })
+  return keys.map(toApiKey)
+}
+
+/** The key comes back in full only here, once. */
+export async function createApiKey(companyId: string, name: string): Promise<string> {
+  const created = await request<{ id: string; apiKey: string }>(`${PATH}/companies/${companyId}/api-keys`, { ...BASE, method: 'POST', body: { name } })
+  return created.apiKey
+}
+
+export async function revokeApiKey(keyId: string): Promise<void> {
+  await request<void>(`${PATH}/api-keys/${keyId}`, { ...BASE, method: 'DELETE' })
 }

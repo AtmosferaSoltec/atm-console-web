@@ -3,12 +3,12 @@ import { EmptyRow } from '@/components/common/EmptyRow'
 import { Table, TBody, Td, Th, THead, Tr } from '@/components/ui/table'
 import { DOCUMENT_TYPE_LABELS } from '@/config/labels'
 import { invoicePath } from '@/config/routes'
-import { formatDocumentNumber, formatMoney } from '@/utils/format'
+import { formatDateTime, formatDocumentNumber, formatMoney } from '@/utils/format'
 import type { InvoicesTableProps } from '../types/document.types'
 import { DocumentStatusBadge } from './DocumentStatusBadge'
 import { TestBadge } from '@/features/companies'
 
-export function InvoicesTable({ invoices, hideCompany = false }: InvoicesTableProps) {
+export function InvoicesTable({ invoices, hideCompany = false, emptyMessage = 'No hay comprobantes con esos filtros.' }: InvoicesTableProps) {
   const columns = hideCompany ? 6 : 7
 
   return (
@@ -25,7 +25,7 @@ export function InvoicesTable({ invoices, hideCompany = false }: InvoicesTablePr
         </Tr>
       </THead>
       <TBody>
-        {invoices.length === 0 && <EmptyRow colSpan={columns} message="No hay comprobantes con esos filtros." />}
+        {invoices.length === 0 && <EmptyRow colSpan={columns} message={emptyMessage} />}
         {invoices.map((invoice) => (
           <Tr key={invoice.id}>
             <Td className="whitespace-nowrap">
@@ -46,7 +46,7 @@ export function InvoicesTable({ invoices, hideCompany = false }: InvoicesTablePr
             <Td>
               <DocumentStatusBadge status={invoice.status} />
             </Td>
-            <Td className="text-slate-500">{invoice.createdAt}</Td>
+            <Td className="whitespace-nowrap text-slate-500">{formatDateTime(new Date(invoice.createdAt))}</Td>
           </Tr>
         ))}
       </TBody>

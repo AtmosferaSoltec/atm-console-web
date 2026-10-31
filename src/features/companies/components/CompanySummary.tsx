@@ -1,14 +1,16 @@
 import { CalendarDays, FileText, KeyRound } from 'lucide-react'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { Card } from '@/components/ui/card'
+import { formatDate } from '@/utils/format'
 import type { CompanySummaryProps } from '../types/company.types'
 import { TestBadge } from './TestBadge'
 
 export function CompanySummary({ company }: CompanySummaryProps) {
+  const counts = company.counts
   const facts = [
-    { icon: FileText, label: 'Documentos del mes', value: String(company.invoicesThisMonth + company.guidesThisMonth) },
-    { icon: KeyRound, label: 'API keys activas', value: String(company.activeApiKeys) },
-    { icon: CalendarDays, label: 'Creada', value: company.createdAt },
+    { icon: FileText, label: 'Documentos del mes', value: counts ? String(counts.invoicesThisMonth + counts.shippingGuidesThisMonth) : '—' },
+    { icon: KeyRound, label: 'API keys activas', value: counts ? String(counts.activeApiKeys) : '—' },
+    { icon: CalendarDays, label: 'Creada', value: formatDate(new Date(company.createdAt)) },
   ]
 
   return (

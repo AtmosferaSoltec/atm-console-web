@@ -1,5 +1,5 @@
 import { Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { CopyField } from '@/components/common/CopyField'
 import { EmptyRow } from '@/components/common/EmptyRow'
@@ -10,17 +10,50 @@ import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Table, TBody, Td, Th, THead, Tr } from '@/components/ui/table'
-import type { CompanyApiKey, ApiKeysTabProps } from '../types/company.types'
+import { formatDate, formatDateTime } from '@/utils/format'
+import { useCompanyAction } from '../hooks/useCompanyAction'
+import { createApiKey, revokeApiKey } from '../services/companyService'
+import type { ApiKeysTabProps, CompanyApiKey } from '../types/company.types'
 
-export function ApiKeysTab({ keys }: ApiKeysTabProps) {
+export function ApiKeysTab({ companyId, keys, isLoading, error, onChanged }: ApiKeysTabProps) {
   const [generating, setGenerating] = useState(false)
-  const [generated, setGenerated] = useState(false)
+  const [name, setName] = useState('')
+  const [generated, setGenerated] = useState<string | null>(null)
   const [revoking, setRevoking] = useState<CompanyApiKey | null>(null)
+  const generate = useCompanyAction()
+  const revoke = useCompanyAction()
 
   const closeGenerate = () => {
     setGenerating(false)
-    setGenerated(false)
+    setGenerated(null)
+    setName('')
+    generate.clearError()
   }
+
+  const handleGenerate = async (event: FormEvent) => {
+    event.preventDefault()
+    if (name.trim() === '') return
+    const key = await generate.run(() => createApiKey(companyId, name.trim()))
+    if (key) {
+      setGenerated(key)
+      onChanged()
+    }
+  }
+
+  const handleRevoke = async () => {
+    if (!revoking) return
+    if (await revoke.run(() => revokeApiKey(revoking.id))) {
+      setRevoking(null)
+      onChanged()
+    }
+  }
+
+  const closeRevoke = () => {
+    revoke.clearError()
+    setRevoking(null)
+  }
+
+  const emptyMessage = isLoading ? 'Cargando API keys...' : (error ?? 'La empresa no tiene API keys.')
 
   return (
     <>
@@ -47,15 +80,15 @@ export function ApiKeysTab({ keys }: ApiKeysTabProps) {
             </Tr>
           </THead>
           <TBody>
-            {keys.length === 0 && <EmptyRow colSpan={6} message="La empresa no tiene API keys." />}
+            {keys.length === 0 && <EmptyRow colSpan={6} message={emptyMessage} />}
             {keys.map((key) => (
               <Tr key={key.id}>
                 <Td className="font-medium text-slate-900">{key.label}</Td>
                 <Td>
                   <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs text-slate-600">{key.prefix}…</code>
                 </Td>
-                <Td className="text-slate-500">{key.createdAt}</Td>
-                <Td className="text-slate-500">{key.lastUsedAt ?? 'Nunca'}</Td>
+                <Td className="text-slate-500">{formatDate(new Date(key.createdAt))}</Td>
+                <Td className="text-slate-500">{key.lastUsedAt ? formatDateTime(new Date(key.lastUsedAt)) : 'Nunca'}</Td>
                 <Td>
                   <StatusBadge status={key.isActive ? 'active' : 'disabled'} />
                 </Td>
@@ -85,26 +118,35 @@ export function ApiKeysTab({ keys }: ApiKeysTabProps) {
               <Button variant="outline" onClick={closeGenerate}>
                 Cancelar
               </Button>
-              <Button onClick={() => setGenerated(true)}>Generar</Button>
+              <Button type="submit" form="generate-key-form" disabled={name.trim() === '' || generate.isBusy}>
+                {generate.isBusy ? 'Generando...' : 'Generar'}
+              </Button>
             </>
           )
         }
       >
         {generated ? (
-          <CopyField value="atm_nbf_live_Hq72zXc9Lr0TnB4yWm8sUa1DfE5pJk3V" />
+          <CopyField value={generated} />
         ) : (
-          <FormField label="Nombre" htmlFor="key-label">
-            <Input id="key-label" placeholder="Sistema de ventas" />
-          </FormField>
+          <form id="generate-key-form" onSubmit={handleGenerate} onChange={generate.clearError} className="space-y-4">
+            <FormField label="Nombre" htmlFor="key-label">
+              <Input id="key-label" placeholder="Sistema de ventas" value={name} onChange={(event) => setName(event.target.value)} autoFocus />
+            </FormField>
+            {generate.error && (
+              <p role="alert" className="text-sm text-red-600">
+                {generate.error}
+              </p>
+            )}
+          </form>
         )}
       </Dialog>
 
       <ConfirmDialog
         open={revoking !== null}
-        onClose={() => setRevoking(null)}
-        onConfirm={() => setRevoking(null)}
+        onClose={closeRevoke}
+        onConfirm={handleRevoke}
         title="¿Revocar esta API key?"
-        description={`${revoking?.label ?? ''} dejará de funcionar al instante. No se puede deshacer.`}
+        description={revoke.error ?? `${revoking?.label ?? ''} dejará de funcionar al instante. No se puede deshacer.`}
         confirmLabel="Revocar"
         destructive
       />

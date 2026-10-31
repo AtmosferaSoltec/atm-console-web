@@ -1,6 +1,6 @@
 import { API_BASE_URL } from '@/config/env'
 import { clearSession, getSession, saveSession } from '@/store/sessionStore'
-import type { ApiErrorBody, RequestOptions, TokenResponse } from '@/types/api.types'
+import type { ApiErrorBody, NestErrorBody, RequestOptions, TokenResponse } from '@/types/api.types'
 
 /** Refresh the access token this long before it actually expires. */
 const REFRESH_MARGIN_MS = 30_000
@@ -36,14 +36,21 @@ async function send<T>(path: string, options: RequestOptions, accessToken?: stri
     return (options.responseType === 'blob' ? await response.blob() : await response.json()) as T
   }
 
-  const body = (await response.json().catch(() => null)) as ApiErrorBody | null
+  const body = (await response.json().catch(() => null)) as ApiErrorBody | NestErrorBody | null
   const retryAfter = Number(response.headers.get('Retry-After'))
-  throw new ApiError(
-    response.status,
-    body?.error.code ?? 'unknown_error',
-    body?.error.message ?? 'Unexpected error.',
-    retryAfter > 0 ? retryAfter : undefined,
-  )
+  const { code, message } = readError(body)
+  throw new ApiError(response.status, code, message, retryAfter > 0 ? retryAfter : undefined)
+}
+
+/** The two error shapes the services answer with: `{ error: { code, message } }`, or Nest's `{ error, message }`. */
+function readError(body: ApiErrorBody | NestErrorBody | null): { code: string; message: string } {
+  if (!body) return { code: 'unknown_error', message: 'Unexpected error.' }
+  if (typeof body.error === 'object' && body.error !== null) {
+    return { code: body.error.code ?? 'unknown_error', message: body.error.message ?? 'Unexpected error.' }
+  }
+  const nest = body as NestErrorBody
+  const message = Array.isArray(nest.message) ? nest.message.join('. ') : (nest.message ?? 'Unexpected error.')
+  return { code: typeof nest.error === 'string' ? nest.error : 'unknown_error', message }
 }
 
 // Concurrent requests share one refresh: the API rotates refresh tokens, so a second call would revoke the session.

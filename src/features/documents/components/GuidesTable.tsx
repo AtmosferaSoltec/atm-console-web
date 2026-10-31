@@ -8,7 +8,7 @@ import { formatDocumentNumber } from '@/utils/format'
 import type { GuidesTableProps } from '../types/document.types'
 import { DocumentStatusBadge } from './DocumentStatusBadge'
 
-export function GuidesTable({ guides }: GuidesTableProps) {
+export function GuidesTable({ guides, emptyMessage = 'No hay guías con esos filtros.' }: GuidesTableProps) {
   return (
     <Table className="min-w-[960px]">
       <THead>
@@ -23,7 +23,7 @@ export function GuidesTable({ guides }: GuidesTableProps) {
         </Tr>
       </THead>
       <TBody>
-        {guides.length === 0 && <EmptyRow colSpan={7} message="No hay guías con esos filtros." />}
+        {guides.length === 0 && <EmptyRow colSpan={7} message={emptyMessage} />}
         {guides.map((guide) => (
           <Tr key={guide.id}>
             <Td className="whitespace-nowrap">

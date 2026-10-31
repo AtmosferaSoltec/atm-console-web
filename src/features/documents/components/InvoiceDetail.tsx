@@ -1,11 +1,9 @@
 import { DetailList, ExternalLink } from '@/components/common/DetailList'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { formatMoney } from '@/utils/format'
+import { formatDateTime, formatMoney } from '@/utils/format'
 import type { InvoiceDetailProps } from '../types/document.types'
 
 export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
-  const link = invoice.status === 'PENDING' ? null : '#'
-
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <Card>
@@ -19,8 +17,8 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
               { label: 'Documento', value: invoice.clientDocument },
               { label: 'Total', value: formatMoney(invoice.total, invoice.currency) },
               { label: 'Referencia externa', value: invoice.externalReference },
-              { label: 'Emitido', value: invoice.createdAt },
-              { label: 'Actualizado', value: invoice.updatedAt },
+              { label: 'Emitido', value: formatDateTime(new Date(invoice.createdAt)) },
+              { label: 'Actualizado', value: formatDateTime(new Date(invoice.updatedAt)) },
             ]}
           />
         </CardContent>
@@ -33,10 +31,10 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
         <CardContent>
           <DetailList
             items={[
-              { label: 'Nubefact', value: <ExternalLink href={link}>Ver en Nubefact</ExternalLink> },
-              { label: 'PDF', value: <ExternalLink href={link}>Descargar PDF</ExternalLink> },
-              { label: 'XML', value: <ExternalLink href={link}>Descargar XML</ExternalLink> },
-              { label: 'CDR', value: <ExternalLink href={invoice.status === 'ACCEPTED' ? '#' : null}>Descargar CDR</ExternalLink> },
+              { label: 'Nubefact', value: <ExternalLink href={invoice.nubefactLink}>Ver en Nubefact</ExternalLink> },
+              { label: 'PDF', value: <ExternalLink href={invoice.pdfLink}>Descargar PDF</ExternalLink> },
+              { label: 'XML', value: <ExternalLink href={invoice.xmlLink}>Descargar XML</ExternalLink> },
+              { label: 'CDR', value: <ExternalLink href={invoice.cdrLink}>Descargar CDR</ExternalLink> },
             ]}
           />
         </CardContent>
@@ -52,7 +50,7 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
               { label: 'Descripción', value: invoice.sunatDescription },
               { label: 'Código', value: invoice.sunatCode || '—' },
               { label: 'Verificaciones', value: invoice.sunatChecks },
-              { label: 'Última verificación', value: invoice.lastSunatCheck },
+              { label: 'Última verificación', value: invoice.lastSunatCheck ? formatDateTime(new Date(invoice.lastSunatCheck)) : null },
             ]}
           />
         </CardContent>
@@ -64,7 +62,7 @@ export function InvoiceDetail({ invoice }: InvoiceDetailProps) {
             <CardTitle>Anulación</CardTitle>
           </CardHeader>
           <CardContent>
-            <DetailList items={[{ label: 'Motivo', value: invoice.voidReason }, { label: 'Anulado', value: invoice.updatedAt }]} />
+            <DetailList items={[{ label: 'Motivo', value: invoice.voidReason }, { label: 'Anulado', value: formatDateTime(new Date(invoice.updatedAt)) }]} />
           </CardContent>
         </Card>
       )}

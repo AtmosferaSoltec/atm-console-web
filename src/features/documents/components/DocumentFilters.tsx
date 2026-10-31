@@ -35,7 +35,7 @@ const ACCOUNT_OPTIONS: SelectOption[] = [
 ]
 
 export function DocumentFilters({ kind, value, onChange }: DocumentFiltersProps) {
-  const companies = useCompanies()
+  const { items: companies } = useCompanies()
 
   const companyOptions: SelectOption[] = [{ value: 'all', label: 'Todas' }, ...companies.map((company) => ({ value: company.id, label: company.name }))]
   const typeOptions: SelectOption[] = [{ value: 'all', label: 'Todos' }, ...TYPE_KEYS[kind].map((type) => ({ value: type, label: DOCUMENT_TYPE_LABELS[type] }))]

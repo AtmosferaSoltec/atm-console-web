@@ -24,3 +24,9 @@ export const MESSAGING_API_BASE_URL: string = import.meta.env.VITE_MESSAGING_API
  * strips it and forwards to the Pulso API; in production the host nginx must do the same.
  */
 export const PULSO_API_BASE_URL: string = import.meta.env.VITE_PULSO_API_URL || '/pulso-api'
+
+/**
+ * Base URL of the billing API (atm-nubefact-api). The default is a same-origin prefix: in development the Vite dev
+ * server strips it and forwards to the billing API; in production the host nginx must do the same.
+ */
+export const NUBEFACT_API_BASE_URL: string = import.meta.env.VITE_NUBEFACT_API_URL || '/nubefact-api'

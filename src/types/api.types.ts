@@ -5,6 +5,13 @@ export interface ApiErrorBody {
   }
 }
 
+/** What a NestJS service answers on an error (atm-nubefact-api): `message` is a text or a list of validation failures. */
+export interface NestErrorBody {
+  statusCode?: number
+  error?: string
+  message?: string | string[]
+}
+
 /** Token payload returned by the auth API on login and refresh. */
 export interface TokenResponse {
   access_token: string

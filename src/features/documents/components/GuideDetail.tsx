@@ -1,10 +1,9 @@
 import { DetailList, ExternalLink } from '@/components/common/DetailList'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { formatDate, formatDateTime } from '@/utils/format'
 import type { GuideDetailProps } from '../types/document.types'
 
 export function GuideDetail({ guide }: GuideDetailProps) {
-  const link = guide.status === 'PENDING' ? null : '#'
-
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <Card>
@@ -17,8 +16,8 @@ export function GuideDetail({ guide }: GuideDetailProps) {
               { label: 'Cliente', value: guide.clientName },
               { label: 'Documento', value: guide.clientDocument },
               { label: 'Destinatario', value: guide.recipient },
-              { label: 'Inicio de traslado', value: guide.transferDate },
-              { label: 'Emitida', value: guide.createdAt },
+              { label: 'Inicio de traslado', value: formatDate(new Date(`${guide.transferDate}T00:00:00`)) },
+              { label: 'Emitida', value: formatDateTime(new Date(guide.createdAt)) },
             ]}
           />
         </CardContent>
@@ -31,9 +30,10 @@ export function GuideDetail({ guide }: GuideDetailProps) {
         <CardContent>
           <DetailList
             items={[
-              { label: 'Nubefact', value: <ExternalLink href={link}>Ver en Nubefact</ExternalLink> },
-              { label: 'PDF', value: <ExternalLink href={link}>Descargar PDF</ExternalLink> },
-              { label: 'XML', value: <ExternalLink href={link}>Descargar XML</ExternalLink> },
+              { label: 'Nubefact', value: <ExternalLink href={guide.nubefactLink}>Ver en Nubefact</ExternalLink> },
+              { label: 'PDF', value: <ExternalLink href={guide.pdfLink}>Descargar PDF</ExternalLink> },
+              { label: 'XML', value: <ExternalLink href={guide.xmlLink}>Descargar XML</ExternalLink> },
+              { label: 'CDR', value: <ExternalLink href={guide.cdrLink}>Descargar CDR</ExternalLink> },
             ]}
           />
         </CardContent>
@@ -49,7 +49,7 @@ export function GuideDetail({ guide }: GuideDetailProps) {
               { label: 'Descripción', value: guide.sunatDescription },
               { label: 'Código', value: guide.sunatCode || '—' },
               { label: 'Verificaciones', value: guide.sunatChecks },
-              { label: 'Última verificación', value: guide.lastSunatCheck },
+              { label: 'Última verificación', value: guide.lastSunatCheck ? formatDateTime(new Date(guide.lastSunatCheck)) : null },
             ]}
           />
         </CardContent>

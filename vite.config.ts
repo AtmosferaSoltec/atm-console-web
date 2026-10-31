@@ -18,6 +18,8 @@ export default defineConfig({
       // Same for the messaging API (run it with HTTP_PORT=8083).
       // Same for the Pulso API (its default port, 3001).
       '/pulso-api': { target: 'http://localhost:3001', rewrite: (path) => path.replace(/^\/pulso-api/, '') },
+      // Same for the billing API (atm-nubefact-api, port 3000 by default).
+      '/nubefact-api': { target: 'http://localhost:3000', rewrite: (path) => path.replace(/^\/nubefact-api/, '') },
       '/messaging-api': { target: 'http://localhost:8083', rewrite: (path) => path.replace(/^\/messaging-api/, '') },
     },
   },

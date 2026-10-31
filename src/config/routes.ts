@@ -39,6 +39,11 @@ export const ROUTES = {
     overview: '/storage/overview',
     files: '/storage/files',
   },
+  lavendimia: {
+    companies: '/lavendimia/companies',
+    users: '/lavendimia/users',
+    roles: '/lavendimia/roles',
+  },
   pulso: {
     branches: '/pulso/branches',
   },

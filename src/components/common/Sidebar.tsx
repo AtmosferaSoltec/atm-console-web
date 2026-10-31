@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { BrandMark } from '@/components/common/BrandMark'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { SidebarGroup } from '@/components/common/SidebarGroup'
-import { NAV_GROUPS } from '@/config/navigation'
+import { NAV_SECTIONS } from '@/config/navigation'
 import { useLogout } from '@/features/auth'
 import type { NavGroup, SidebarProps } from '@/types/navigation.types'
 
@@ -21,15 +21,20 @@ export function Sidebar({ onNavigate }: SidebarProps) {
     <div className="flex h-full flex-col bg-ink px-4 py-5">
       <BrandMark tone="light" className="px-2" />
 
-      <nav className="scrollbar-thin mt-6 -mr-2 flex-1 space-y-3 overflow-y-auto pr-2">
-        {NAV_GROUPS.map((group) => (
-          <SidebarGroup
-            key={group.label}
-            group={group}
-            open={group.alwaysOpen || isOpen(group)}
-            onToggle={() => setToggled((current) => ({ ...current, [group.label]: !isOpen(group) }))}
-            onNavigate={onNavigate}
-          />
+      <nav className="scrollbar-thin mt-6 -mr-2 flex-1 space-y-5 overflow-y-auto pr-2">
+        {NAV_SECTIONS.map((section) => (
+          <section key={section.label} aria-label={section.label} className="space-y-3">
+            <h2 className="px-3 text-[10px] font-bold tracking-[0.18em] text-slate-600 uppercase">{section.label}</h2>
+            {section.groups.map((group) => (
+              <SidebarGroup
+                key={group.label}
+                group={group}
+                open={group.alwaysOpen || isOpen(group)}
+                onToggle={() => setToggled((current) => ({ ...current, [group.label]: !isOpen(group) }))}
+                onNavigate={onNavigate}
+              />
+            ))}
+          </section>
         ))}
       </nav>
 

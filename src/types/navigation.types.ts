@@ -13,6 +13,12 @@ export interface NavGroup {
   alwaysOpen?: boolean
 }
 
+/** A block of the menu: the products ("Sistemas") or the platform ("Microservicios"). */
+export interface NavSection {
+  label: string
+  groups: NavGroup[]
+}
+
 export interface SidebarProps {
   onNavigate?: () => void
 }

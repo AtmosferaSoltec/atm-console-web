@@ -10,6 +10,9 @@ import { IdentityRecordsPage } from '@/pages/IdentityRecordsPage'
 import { IdentitySystemsPage } from '@/pages/IdentitySystemsPage'
 import { IdentityUsagePage } from '@/pages/IdentityUsagePage'
 import { LoginPage } from '@/pages/LoginPage'
+import { LavendimiaCompaniesPage } from '@/pages/LavendimiaCompaniesPage'
+import { LavendimiaRolesPage } from '@/pages/LavendimiaRolesPage'
+import { LavendimiaUsersPage } from '@/pages/LavendimiaUsersPage'
 import { PulsoPage } from '@/pages/PulsoPage'
 import { StorageOverviewPage } from '@/pages/StorageOverviewPage'
 import { TemplatesPage } from '@/pages/TemplatesPage'
@@ -71,6 +74,9 @@ export function AppRoutes() {
           <Route path={ROUTES.documents.activity} element={<DocumentActivityPage />} />
           <Route path={ROUTES.storage.overview} element={<StorageOverviewPage />} />
           <Route path={ROUTES.storage.files} element={<FilesPage />} />
+          <Route path={ROUTES.lavendimia.companies} element={<LavendimiaCompaniesPage />} />
+          <Route path={ROUTES.lavendimia.users} element={<LavendimiaUsersPage />} />
+          <Route path={ROUTES.lavendimia.roles} element={<LavendimiaRolesPage />} />
           <Route path={ROUTES.pulso.branches} element={<PulsoPage />} />
           <Route path="*" element={<PlaceholderPage />} />
         </Route>

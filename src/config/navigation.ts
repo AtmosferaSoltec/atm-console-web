@@ -13,15 +13,37 @@ import {
   LayoutTemplate,
   MessagesSquare,
   Receipt,
+  ShieldCheck,
   Smartphone,
   Truck,
   Users,
+  Wine,
   Workflow,
 } from 'lucide-react'
-import type { NavGroup } from '@/types/navigation.types'
+import type { NavGroup, NavSection } from '@/types/navigation.types'
 import { ROUTES } from './routes'
 
-export const NAV_GROUPS: NavGroup[] = [
+/**
+ * The products. Each system is declared here and owns its own screens: what is configured for La Vendimia is not
+ * what is configured for Pulso. A system that is not listed has no section yet.
+ */
+const SYSTEM_GROUPS: NavGroup[] = [
+  {
+    label: 'La Vendimia',
+    items: [
+      { label: 'Empresas', to: ROUTES.lavendimia.companies, icon: Wine },
+      { label: 'Usuarios', to: ROUTES.lavendimia.users, icon: Users },
+      { label: 'Roles', to: ROUTES.lavendimia.roles, icon: ShieldCheck },
+    ],
+  },
+  {
+    label: 'Pulso',
+    items: [{ label: 'Grupos y gimnasios', to: ROUTES.pulso.branches, icon: Dumbbell }],
+  },
+]
+
+/** The platform: the microservices every system uses. */
+const SERVICE_GROUPS: NavGroup[] = [
   {
     label: 'Autenticación',
     items: [
@@ -70,8 +92,12 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: 'Archivos', to: ROUTES.storage.files, icon: Files },
     ],
   },
-  {
-    label: 'Pulso',
-    items: [{ label: 'Grupos y gimnasios', to: ROUTES.pulso.branches, icon: Dumbbell }],
-  },
 ]
+
+export const NAV_SECTIONS: NavSection[] = [
+  { label: 'Sistemas', groups: SYSTEM_GROUPS },
+  { label: 'Microservicios', groups: SERVICE_GROUPS },
+]
+
+/** Every group of the menu, in order. */
+export const NAV_GROUPS: NavGroup[] = NAV_SECTIONS.flatMap((section) => section.groups)

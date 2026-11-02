@@ -1,7 +1,7 @@
 import type { TenantItem } from '@/features/tenants'
 
-/** The code the auth API gives La Vendimia. It is declared there, in the catalog of systems. */
-export const LAVENDIMIA_SYSTEM_CODE = 'lavendimia'
+/** The code the auth API gives La Vendimia (Zenit). It is declared there, in the catalog of systems. */
+export const LAVENDIMIA_SYSTEM_CODE = 'zenit'
 
 export interface LavendimiaCompaniesTableProps {
   companies: TenantItem[]

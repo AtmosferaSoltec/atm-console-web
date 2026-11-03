@@ -5,6 +5,8 @@ import type { EntityStatus } from '@/types/common.types'
 export interface UserItem {
   id: string
   dni: string
+  /** Empty when the account has none. */
+  email: string
   fullName: string
   status: EntityStatus
   /** True while the account still has its initial password (the DNI). */
@@ -16,6 +18,7 @@ export interface UserItem {
 export interface UserResponse {
   id: string
   dni: string
+  email?: string
   full_name: string
   status: EntityStatus
   must_change_password: boolean

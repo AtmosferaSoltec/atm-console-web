@@ -13,6 +13,7 @@ import { LoginPage } from '@/pages/LoginPage'
 import { LavendimiaCompaniesPage } from '@/pages/LavendimiaCompaniesPage'
 import { LavendimiaRolesPage } from '@/pages/LavendimiaRolesPage'
 import { LavendimiaUsersPage } from '@/pages/LavendimiaUsersPage'
+import { OrbitaUsersPage } from '@/pages/OrbitaUsersPage'
 import { PulsoPage } from '@/pages/PulsoPage'
 import { StorageOverviewPage } from '@/pages/StorageOverviewPage'
 import { TemplatesPage } from '@/pages/TemplatesPage'
@@ -78,6 +79,7 @@ export function AppRoutes() {
           <Route path={ROUTES.lavendimia.users} element={<LavendimiaUsersPage />} />
           <Route path={ROUTES.lavendimia.roles} element={<LavendimiaRolesPage />} />
           <Route path={ROUTES.pulso.branches} element={<PulsoPage />} />
+          <Route path={ROUTES.orbita.users} element={<OrbitaUsersPage />} />
           <Route path="*" element={<PlaceholderPage />} />
         </Route>
       </Route>

@@ -5,6 +5,7 @@ function toUserItem(user: UserResponse): UserItem {
   return {
     id: user.id,
     dni: user.dni,
+    email: user.email ?? '',
     fullName: user.full_name,
     status: user.status,
     mustChangePassword: user.must_change_password,

@@ -47,6 +47,9 @@ export const ROUTES = {
   pulso: {
     branches: '/pulso/branches',
   },
+  orbita: {
+    users: '/orbita/users',
+  },
 } as const
 
 export function systemPath(systemId: string): string {

@@ -40,6 +40,10 @@ const SYSTEM_GROUPS: NavGroup[] = [
     label: 'Pulso',
     items: [{ label: 'Grupos y gimnasios', to: ROUTES.pulso.branches, icon: Dumbbell }],
   },
+  {
+    label: 'Orbita',
+    items: [{ label: 'Usuarios', to: ROUTES.orbita.users, icon: Users }],
+  },
 ]
 
 /** The platform: the microservices every system uses. */

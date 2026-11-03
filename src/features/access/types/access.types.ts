@@ -3,8 +3,11 @@ export interface AccessItem {
   userId: string
   userName: string
   userDni: string
+  /** Empty when the API does not send it. */
+  userEmail: string
   systemId: string
   systemName: string
+  /** Empty for personal systems such as Orbita, which have no companies. */
   tenantId: string
   tenantName: string
   /** One of the fixed roles of the system; the API refuses any other. */
@@ -20,7 +23,9 @@ export interface AccessResponse {
   system_code?: string
   system_name?: string
   user_dni?: string
+  user_email?: string
   user_name?: string
+  /** Empty for personal systems. */
   tenant_id: string
   tenant_name?: string
   role: string

@@ -1,5 +1,6 @@
 import type { AccessItem } from '@/features/access'
 import type { TenantItem } from '@/features/tenants'
+import type { UserDocumentType } from '@/features/users'
 
 export interface BranchResponse {
   id: string
@@ -77,7 +78,8 @@ export interface PulsoTeam {
 export interface NewMemberInput {
   systemId: string
   tenantId: string
-  dni: string
+  documentType: UserDocumentType
+  documentNumber: string
   fullName: string
   role: string
 }

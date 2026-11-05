@@ -11,6 +11,7 @@ import { Table, TBody, Td, Th, THead, Tr } from '@/components/ui/table'
 import { userPath } from '@/config/routes'
 import type { AccessItem } from '@/features/access'
 import { formatDate } from '@/utils/format'
+import { formatUserDocument } from '../services/userDocuments'
 import type { UsersListProps } from '../types/user.types'
 
 function emptyMessage(isLoading: boolean, error: string | null, total: number): string {
@@ -71,7 +72,7 @@ export function UsersList({ users, isLoading, error, access, systems, isAccessLo
     const term = search.trim().toLowerCase()
     return users.filter((user) => {
       if (status !== ALL && user.status !== status) return false
-      if (term !== '' && !user.fullName.toLowerCase().includes(term) && !user.dni.includes(term)) return false
+      if (term !== '' && !user.fullName.toLowerCase().includes(term) && !user.documentNumber.toLowerCase().includes(term)) return false
       const accesses = accessByUser.get(user.id) ?? []
       if (systemId === NO_ACCESS) return accesses.length === 0
       if (systemId === ALL && tenantId === ALL) return true
@@ -82,7 +83,7 @@ export function UsersList({ users, isLoading, error, access, systems, isAccessLo
 
   return (
     <Card>
-      <ListToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar por nombre o DNI" status={status} onStatusChange={setStatus}>
+      <ListToolbar search={search} onSearchChange={setSearch} searchPlaceholder="Buscar por nombre o documento" status={status} onStatusChange={setStatus}>
         <Select value={systemId} onValueChange={setSystemId} options={systemOptions} aria-label="Sistema" className="sm:w-52" disabled={!accessReady} />
         <Select
           value={systemId === NO_ACCESS ? ALL : tenantId}
@@ -103,7 +104,7 @@ export function UsersList({ users, isLoading, error, access, systems, isAccessLo
           <THead>
             <Tr>
               <Th>Usuario</Th>
-              <Th>DNI</Th>
+              <Th>Documento</Th>
               <Th>Accesos</Th>
               <Th>Estado</Th>
               <Th>Creado</Th>
@@ -122,7 +123,7 @@ export function UsersList({ users, isLoading, error, access, systems, isAccessLo
                     {user.fullName}
                   </Link>
                 </Td>
-                <Td className="font-mono text-slate-600">{user.dni}</Td>
+                <Td className="font-mono text-slate-600">{formatUserDocument(user) || '—'}</Td>
                 <Td>
                   <UserAccesses accesses={accessByUser.get(user.id) ?? []} ready={accessReady} />
                 </Td>

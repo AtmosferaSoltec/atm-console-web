@@ -111,10 +111,11 @@ export async function createGym(input: NewGymInput): Promise<void> {
   if (gym && gym.groupId !== input.groupId) await moveGym(gym.id, input.groupId)
 }
 
-/** Gives a person access to the gym's company, creating their account by DNI when it does not exist. */
+/** Gives a person access to the gym's company, creating their account by document when it does not exist. */
 export async function addMember(input: NewMemberInput): Promise<void> {
-  const existing = (await listUsers()).find((user) => user.dni === input.dni)
-  const user = existing ?? (await createUser({ dni: input.dni, fullName: input.fullName }))
+  // Numbers are unique across document types, so the number alone finds the account.
+  const existing = (await listUsers()).find((user) => user.documentNumber === input.documentNumber)
+  const user = existing ?? (await createUser({ documentType: input.documentType, documentNumber: input.documentNumber, fullName: input.fullName }))
   // Pulso admins always manage their own team (they create their receptionists).
   await assignAccess({ userId: user.id, systemId: input.systemId, tenantId: input.tenantId, role: input.role, manageUsers: input.role === 'admin' })
 }

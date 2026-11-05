@@ -30,3 +30,9 @@ export const PULSO_API_BASE_URL: string = import.meta.env.VITE_PULSO_API_URL || 
  * server strips it and forwards to the billing API; in production the host nginx must do the same.
  */
 export const NUBEFACT_API_BASE_URL: string = import.meta.env.VITE_NUBEFACT_API_URL || '/nubefact-api'
+
+/**
+ * Base URL of atm-billing-api, the collections of the clients (section Cobros). The default is a same-origin prefix:
+ * in development the Vite dev server strips it and forwards to the API; in production the host nginx must do the same.
+ */
+export const BILLING_API_BASE_URL: string = import.meta.env.VITE_BILLING_API_URL || '/billing-api'

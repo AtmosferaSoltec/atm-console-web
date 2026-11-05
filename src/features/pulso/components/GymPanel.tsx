@@ -78,7 +78,7 @@ export function GymPanel({ gym, tenant, members, onEditCompany, onMoveGym, onAdd
               <li key={member.id} className="flex items-center justify-between gap-3 py-2">
                 <div className="min-w-0">
                   <p className="truncate text-sm text-slate-800">{member.userName}</p>
-                  <p className="font-mono text-xs text-slate-500">{member.userDni}</p>
+                  <p className="font-mono text-xs text-slate-500">{member.userDocumentNumber}</p>
                 </div>
                 <span className="flex items-center gap-2">
                   <Badge tone={member.role === 'admin' ? 'info' : 'neutral'} dot={false}>

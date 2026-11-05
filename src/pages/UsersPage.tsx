@@ -14,7 +14,7 @@ export function UsersPage() {
     <>
       <PageHeader
         title="Usuarios"
-        description="Cuentas globales de Atmosfera. Una por persona, identificada por su DNI."
+        description="Cuentas globales de Atmosfera. Una por persona, identificada por su documento (DNI, carné de extranjería o pasaporte)."
         actions={
           <Button onClick={() => setCreating(true)}>
             <Plus className="size-4" />

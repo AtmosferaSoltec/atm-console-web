@@ -48,7 +48,7 @@ export function AccessTable({ items, variant, isLoading, error, onChanged }: Acc
                 ) : (
                   <>
                     <span className="block font-medium text-slate-900">{item.userName}</span>
-                    <span className="block font-mono text-xs text-slate-500">{item.userDni}</span>
+                    <span className="block font-mono text-xs text-slate-500">{item.userDocumentNumber}</span>
                   </>
                 )}
               </Td>

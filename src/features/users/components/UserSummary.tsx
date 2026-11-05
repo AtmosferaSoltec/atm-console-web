@@ -2,11 +2,12 @@ import { CalendarDays, IdCard } from 'lucide-react'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { Card } from '@/components/ui/card'
 import { formatDate } from '@/utils/format'
+import { formatUserDocument } from '../services/userDocuments'
 import type { UserSummaryProps } from '../types/user.types'
 
 export function UserSummary({ user }: UserSummaryProps) {
   const facts = [
-    { icon: IdCard, label: 'DNI', value: user.dni },
+    { icon: IdCard, label: 'Documento', value: formatUserDocument(user) || '—' },
     { icon: CalendarDays, label: 'Creado', value: formatDate(new Date(user.createdAt)) },
   ]
 

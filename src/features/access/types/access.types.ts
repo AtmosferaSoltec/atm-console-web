@@ -2,7 +2,8 @@ export interface AccessItem {
   id: string
   userId: string
   userName: string
-  userDni: string
+  /** The number of the person's document (DNI, CE or passport); empty when the account has none. */
+  userDocumentNumber: string
   /** Empty when the API does not send it. */
   userEmail: string
   systemId: string
@@ -22,6 +23,9 @@ export interface AccessResponse {
   system_id: string
   system_code?: string
   system_name?: string
+  user_document_type?: string
+  user_document_number?: string
+  /** Deprecated by the API: the same number as user_document_number. */
   user_dni?: string
   user_email?: string
   user_name?: string

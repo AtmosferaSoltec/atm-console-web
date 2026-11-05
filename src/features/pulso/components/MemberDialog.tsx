@@ -5,24 +5,25 @@ import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { useRoles } from '@/features/roles'
+import { DocumentFields, isValidDocument } from '@/features/users'
+import type { UserDocumentType } from '@/features/users'
 import { usePulsoActions } from '../hooks/usePulsoActions'
 import { roleLabel } from '../services/roleLabels'
 import type { Gym, MemberDialogProps } from '../types/pulso.types'
 
-const DNI_LENGTH = 8
-
 function MemberForm({ gym, systemId, onClose, onSaved }: Omit<MemberDialogProps, 'gym'> & { gym: Gym }) {
-  const [dni, setDni] = useState('')
+  const [documentType, setDocumentType] = useState<UserDocumentType>('dni')
+  const [documentNumber, setDocumentNumber] = useState('')
   const [fullName, setFullName] = useState('')
   const [role, setRole] = useState('')
   const { addMember, isBusy, error, clearError } = usePulsoActions()
   const { roles } = useRoles(systemId ?? '')
-  const canSubmit = dni.length === DNI_LENGTH && fullName.trim() !== '' && role !== '' && systemId !== null && !isBusy
+  const canSubmit = isValidDocument(documentType, documentNumber) && fullName.trim() !== '' && role !== '' && systemId !== null && !isBusy
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
     if (!canSubmit || !systemId) return
-    if (await addMember({ systemId, tenantId: gym.tenantId, dni, fullName: fullName.trim(), role })) {
+    if (await addMember({ systemId, tenantId: gym.tenantId, documentType, documentNumber, fullName: fullName.trim(), role })) {
       onSaved()
       onClose()
     }
@@ -45,18 +46,15 @@ function MemberForm({ gym, systemId, onClose, onSaved }: Omit<MemberDialogProps,
       }
     >
       <form id="member-form" onSubmit={handleSubmit} onChange={clearError} className="space-y-4">
-        <FormField label="DNI" htmlFor="member-dni" hint="Si ya tiene cuenta se usa la que existe. Si no, se crea con el DNI como clave inicial.">
-          <Input
-            id="member-dni"
-            inputMode="numeric"
-            maxLength={DNI_LENGTH}
-            placeholder="Ingresa el DNI"
-            className="font-mono"
-            value={dni}
-            onChange={(event) => setDni(event.target.value.replace(/\D/g, ''))}
-            autoFocus
-          />
-        </FormField>
+        <DocumentFields
+          idPrefix="member"
+          documentType={documentType}
+          documentNumber={documentNumber}
+          onDocumentTypeChange={setDocumentType}
+          onDocumentNumberChange={setDocumentNumber}
+          hint="Si ya tiene cuenta se usa la que existe. Si no, se crea con su número de documento como clave inicial."
+          autoFocus
+        />
         <FormField label="Nombre completo" htmlFor="member-name">
           <Input id="member-name" placeholder="Ingresa el nombre completo" maxLength={200} value={fullName} onChange={(event) => setFullName(event.target.value)} />
         </FormField>

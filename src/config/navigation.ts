@@ -7,9 +7,11 @@ import {
   FileText,
   Files,
   Gauge,
+  HandCoins,
   HardDrive,
   KeyRound,
   Layers,
+  ListChecks,
   LayoutTemplate,
   MessagesSquare,
   Receipt,
@@ -80,6 +82,13 @@ const SERVICE_GROUPS: NavGroup[] = [
       { label: 'Consumo', to: ROUTES.identity.usage, icon: Activity },
       { label: 'Sistemas con acceso', to: ROUTES.identity.systems, icon: KeyRound },
       { label: 'Datos guardados', to: ROUTES.identity.records, icon: Database },
+    ],
+  },
+  {
+    label: 'Cobros',
+    items: [
+      { label: 'Clientes', to: ROUTES.collections.clients, icon: HandCoins },
+      { label: 'Cargos', to: ROUTES.collections.charges, icon: ListChecks },
     ],
   },
   {

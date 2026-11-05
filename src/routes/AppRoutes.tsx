@@ -18,6 +18,9 @@ import { PulsoPage } from '@/pages/PulsoPage'
 import { StorageOverviewPage } from '@/pages/StorageOverviewPage'
 import { TemplatesPage } from '@/pages/TemplatesPage'
 import { MessagingSystemsPage } from '@/pages/MessagingSystemsPage'
+import { CollectionsChargesPage } from '@/pages/CollectionsChargesPage'
+import { CollectionsClientDetailPage } from '@/pages/CollectionsClientDetailPage'
+import { CollectionsClientsPage } from '@/pages/CollectionsClientsPage'
 import { ConnectPage } from '@/pages/ConnectPage'
 import { ClientsPage } from '@/pages/ClientsPage'
 import { CompaniesPage } from '@/pages/CompaniesPage'
@@ -26,6 +29,7 @@ import { CompanyNewPage } from '@/pages/CompanyNewPage'
 import { InvoiceDetailPage } from '@/pages/InvoiceDetailPage'
 import { InvoicesPage } from '@/pages/InvoicesPage'
 import { MessagesPage } from '@/pages/MessagesPage'
+import { StatementPage } from '@/pages/StatementPage'
 import { SessionsPage } from '@/pages/SessionsPage'
 import { ShippingGuideDetailPage } from '@/pages/ShippingGuideDetailPage'
 import { ShippingGuidesPage } from '@/pages/ShippingGuidesPage'
@@ -48,6 +52,7 @@ export function AppRoutes() {
       <Route path="/" element={<Navigate to={ROUTES.login} replace />} />
       <Route path={ROUTES.login} element={<LoginPage />} />
       <Route path={ROUTES.connect} element={<ConnectPage />} />
+      <Route path={ROUTES.statement} element={<StatementPage />} />
 
       <Route element={<PrivateRoute />}>
         <Route element={<DashboardLayout />}>
@@ -80,6 +85,9 @@ export function AppRoutes() {
           <Route path={ROUTES.lavendimia.roles} element={<LavendimiaRolesPage />} />
           <Route path={ROUTES.pulso.branches} element={<PulsoPage />} />
           <Route path={ROUTES.orbita.users} element={<OrbitaUsersPage />} />
+          <Route path={ROUTES.collections.clients} element={<CollectionsClientsPage />} />
+          <Route path={ROUTES.collections.charges} element={<CollectionsChargesPage />} />
+          <Route path={ROUTES.collections.clientDetail} element={<CollectionsClientDetailPage />} />
           <Route path="*" element={<PlaceholderPage />} />
         </Route>
       </Route>

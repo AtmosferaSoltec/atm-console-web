@@ -73,7 +73,7 @@ export function AssignAccessDialog({ open, onClose, onAssigned, userId, systemId
               value={selectedUser}
               onValueChange={setSelectedUser}
               placeholder="Elige un usuario"
-              options={users.map((user) => ({ value: user.id, label: `${user.fullName} · ${user.dni}` }))}
+              options={users.map((user) => ({ value: user.id, label: user.documentNumber ? `${user.fullName} · ${user.documentNumber}` : user.fullName }))}
             />
           </FormField>
         )}

@@ -6,7 +6,7 @@ function toAccessItem(access: AccessResponse): AccessItem {
     id: access.id,
     userId: access.user_id,
     userName: access.user_name ?? '',
-    userDni: access.user_dni ?? '',
+    userDocumentNumber: access.user_document_number ?? access.user_dni ?? '',
     userEmail: access.user_email ?? '',
     systemId: access.system_id,
     systemName: access.system_name ?? access.system_code ?? '',

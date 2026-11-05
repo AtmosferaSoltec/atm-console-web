@@ -213,3 +213,16 @@ export interface FilterFieldProps {
   htmlFor: string
   children: ReactNode
 }
+
+export type ToastTone = 'success' | 'error'
+
+export interface ToastMessage {
+  id: number
+  tone: ToastTone
+  message: string
+}
+
+export interface ToastProps {
+  toast: ToastMessage | null
+  onDismiss: () => void
+}

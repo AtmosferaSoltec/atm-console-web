@@ -25,7 +25,7 @@ export function UserActions({ user, onChanged }: UserActionsProps) {
       <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-sm font-semibold text-slate-900">Restablecer contraseña</h2>
-          <p className="mt-0.5 text-sm text-slate-500">Vuelve a ser su DNI, debe cambiarla al ingresar y se cierran sus sesiones.</p>
+          <p className="mt-0.5 text-sm text-slate-500">Vuelve a ser su número de documento, debe cambiarla al ingresar y se cierran sus sesiones.</p>
         </div>
         <Button variant="outline" disabled={isWorking} onClick={() => setPending('reset')}>
           Restablecer contraseña
@@ -53,7 +53,7 @@ export function UserActions({ user, onChanged }: UserActionsProps) {
         onClose={() => setPending(null)}
         onConfirm={handleConfirm}
         title="Restablecer contraseña"
-        description={`La contraseña de ${user.fullName} volverá a ser su DNI y deberá cambiarla al ingresar. Se cerrarán sus sesiones.`}
+        description={`La contraseña de ${user.fullName} volverá a ser su número de documento y deberá cambiarla al ingresar. Se cerrarán sus sesiones.`}
         confirmLabel="Restablecer"
       />
       <ConfirmDialog

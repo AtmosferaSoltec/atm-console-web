@@ -29,7 +29,7 @@ export function useUserActions() {
     notice,
     error,
     resetPassword: (userId: string) =>
-      run(() => resetUserPassword(userId), 'Contraseña restablecida. Ahora es su DNI y deberá cambiarla al ingresar.'),
+      run(() => resetUserPassword(userId), 'Contraseña restablecida. Ahora es su número de documento y deberá cambiarla al ingresar.'),
     setStatus: (userId: string, status: 'active' | 'disabled') =>
       run(() => setUserStatus(userId, status), status === 'disabled' ? 'Cuenta desactivada. Se cerraron sus sesiones.' : 'Cuenta activada.'),
   }

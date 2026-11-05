@@ -47,4 +47,5 @@ Other modules import from a feature only through its `index.ts` barrel.
 - Systems come from a catalog in `atm-auth-api`; the console must not offer creating or deleting them.
 - The Pulso section calls `/pulso-api/api/v1/admin/*` with the console session token (same pattern as `src/features/storage`) and reuses the auth services of `clients`, `tenants`, `users`, `access` and `systems` through their barrels instead of duplicating calls.
 - A company's RUC is optional: never assume it is present or show `undefined`.
+- The Cobros section (`src/features/collections`) calls atm-billing-api under `/billing-api` with the console session token. It is not the electronic invoicing of `/billing/*` (atm-nubefact-api). Balances and statuses come calculated from the API; currencies are never added together. The client's statement is the public page `/statement/:token`.
 

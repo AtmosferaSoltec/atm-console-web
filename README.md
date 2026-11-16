@@ -87,6 +87,10 @@ Pushing to the `production` branch runs `.github/workflows/deploy.yml`: builds t
 
 The console has no configuration or secrets on the server.
 
+## Sign-in
+
+Only the superadmin of `atm-auth-api` signs in. Besides the user and password, the form asks for the 6-digit code of the authenticator app (the field uses `autocomplete="one-time-code"`, so Apple Passwords can fill it). The code is checked by the auth API (`ADMIN_TOTP_SECRET`, see "Superadmin second factor" in its README); when that secret is empty in local development, any 6 digits are accepted.
+
 ## Systems and Pulso
 
 - **Roles are fixed too.** Each system's roles are declared in the auth API catalog; the console lists them (read-only tab) and assigns them to users. The API refuses any role outside the catalog (`unknown_role`).

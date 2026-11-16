@@ -5,7 +5,7 @@ import type { LoginFormValues } from '../types/auth.types'
 
 function loginErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
-    if (error.code === 'invalid_credentials') return 'Usuario o contraseña incorrectos.'
+    if (error.code === 'invalid_credentials') return 'Usuario, contraseña o código incorrectos. Si el código ya se usó, espera el siguiente.'
     if (error.code === 'too_many_attempts') {
       const minutes = Math.ceil((error.retryAfterSeconds ?? 60) / 60)
       return `Demasiados intentos. Intenta de nuevo en ${minutes} min.`

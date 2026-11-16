@@ -37,7 +37,7 @@ export function PulsoClientsPage() {
         actions={
           <Button onClick={() => navigate(ROUTES.pulso.clientNew)}>
             <Plus className="size-4" />
-            Nuevo cliente
+            Agregar cliente
           </Button>
         }
       />
@@ -74,7 +74,7 @@ export function PulsoClientsPage() {
         ))}
         {filtered.length === 0 && (
           <p className="rounded-xl border border-dashed border-slate-200 bg-white px-6 py-10 text-center text-sm text-slate-500">
-            {term ? `Ningún cliente coincide con “${search.trim()}”.` : 'Todavía no hay clientes. Crea el primero con “Nuevo cliente”.'}
+            {term ? `Ningún cliente coincide con “${search.trim()}”.` : 'Ningún cliente usa Pulso todavía. Dale Pulso al primero con “Agregar cliente”.'}
           </p>
         )}
       </div>

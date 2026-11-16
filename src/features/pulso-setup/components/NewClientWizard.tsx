@@ -1,37 +1,38 @@
 import { ArrowLeft, ArrowRight, Building2, Check, MapPin, Plus, Puzzle, UserRound, UserCog } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { FormField } from '@/components/common/FormField'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
+import { ROUTES } from '@/config/routes'
 import { pulsoErrorMessage } from '@/features/pulso'
+import { formatUserDocument } from '@/features/users'
 import { cn } from '@/utils/cn'
-import { companyProblems, emptyClient, emptyCompany } from '../services/drafts'
+import { adminProblems, companyProblems, emptyClient, emptyCompany } from '../services/drafts'
 import { moduleName } from '../services/moduleCatalog'
-import { createClientWithCompanies } from '../services/pulsoAdminService'
+import { addClientToPulso } from '../services/pulsoAdminService'
 import type { ClientDraft, DraftCompany, NewClientWizardProps } from '../types/pulsoSetup.types'
+import { AdminPicker } from './AdminPicker'
 import { CompanyDraftFields } from './CompanyDraftFields'
 import { ModulePicker } from './ModulePicker'
 
 const STEPS = [
-  { title: 'Cliente', hint: 'El dueño del negocio', icon: UserRound },
+  { title: 'Cliente', hint: 'A quién le das Pulso', icon: UserRound },
   { title: 'Empresas y sedes', hint: 'Qué marcas y dónde', icon: Building2 },
   { title: 'Módulos', hint: 'Qué puede usar cada empresa', icon: Puzzle },
   { title: 'Administrador', hint: 'Quién entra primero', icon: UserCog },
   { title: 'Revisar', hint: 'Confirmar y crear', icon: Check },
 ] as const
 
-const NEW_CLIENT = 'new'
-
 function stepProblems(step: number, draft: ClientDraft): string[] {
-  if (step === 0) return draft.existingClientId || draft.name.trim() ? [] : ['Escribe el nombre del cliente.']
-  if (step === 1) return draft.companies.flatMap((company, index) => companyProblems({ ...company, adminDocument: '', adminName: '' }).map((problem) => `Empresa ${index + 1}: ${problem}`))
-  if (step === 3) return draft.companies.flatMap((company) => companyProblems(company).map((problem) => `${company.tradeName}: ${problem}`))
+  if (step === 0) return draft.clientId ? [] : ['Elige el cliente.']
+  if (step === 1) return draft.companies.flatMap((company, index) => companyProblems(company).map((problem) => `Empresa ${index + 1}: ${problem}`))
+  if (step === 3) return draft.companies.flatMap((company) => adminProblems(company.admin).map((problem) => `${company.tradeName}: ${problem}`))
   return []
 }
 
-/** Creates a client with its companies, branches, modules and first admins in one flow. */
+/** Gives Pulso to an existing client: its companies, branches, modules and first admins in one flow. */
 export function NewClientWizard({ data, onCancel, onCreated }: NewClientWizardProps) {
   const [step, setStep] = useState(0)
   const [draft, setDraft] = useState<ClientDraft>(emptyClient)
@@ -40,8 +41,8 @@ export function NewClientWizard({ data, onCancel, onCreated }: NewClientWizardPr
   const [failure, setFailure] = useState<string | null>(null)
   const problems = stepProblems(step, draft)
   const { modules, systemId } = data
-  const existing = data.authClients.find((client) => client.id === draft.existingClientId)
-  const clientName = existing?.name ?? draft.name.trim()
+  const clientName = data.authClients.find((client) => client.id === draft.clientId)?.name ?? ''
+  const withPulso = new Set(data.clients.map((client) => client.id))
   const creating = progress !== null
 
   const create = async () => {
@@ -52,7 +53,7 @@ export function NewClientWizard({ data, onCancel, onCreated }: NewClientWizardPr
     setFailure(null)
     setProgress('Empezando…')
     try {
-      onCreated(await createClientWithCompanies(draft, systemId, setProgress))
+      onCreated(await addClientToPulso(draft, systemId, setProgress))
     } catch (caught) {
       setFailure(
         `${pulsoErrorMessage(caught, 'No se pudo terminar.')} Lo que se alcanzó a crear quedó guardado: revísalo en la lista de clientes antes de intentar de nuevo.`,
@@ -130,23 +131,32 @@ export function NewClientWizard({ data, onCancel, onCreated }: NewClientWizardPr
           {step === 0 && (
             <>
               <p className="text-sm text-slate-500">
-                El cliente es quien te paga. Puede tener una o varias empresas (cada una con su RUC y su marca). Si ya usa otro sistema de Atmósfera, elígelo.
+                El cliente es quien te paga. Puede tener una o varias empresas (cada una con su RUC y su marca). Los clientes se crean en{' '}
+                <Link to={ROUTES.auth.clients} className="font-medium text-brand-700 underline-offset-2 hover:underline">
+                  Autenticación › Clientes
+                </Link>
+                , y aquí eliges a cuál le das Pulso.
               </p>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField label="Cliente" htmlFor="client-pick">
-                  <Select
-                    id="client-pick"
-                    value={draft.existingClientId ?? NEW_CLIENT}
-                    onValueChange={(value) => setDraft({ ...draft, existingClientId: value === NEW_CLIENT ? null : value })}
-                    options={[{ value: NEW_CLIENT, label: 'Cliente nuevo' }, ...data.authClients.map((client) => ({ value: client.id, label: client.name }))]}
-                  />
-                </FormField>
-                {!draft.existingClientId && (
-                  <FormField label="Nombre del cliente" htmlFor="client-name" hint="Para ti. El gimnasio no lo ve.">
-                    <Input id="client-name" value={draft.name} placeholder="Ej. Iron Gym" maxLength={120} onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
+              {data.authClients.length === 0 ? (
+                <p className="rounded-lg border border-dashed border-slate-200 px-4 py-6 text-center text-sm text-slate-500">
+                  Todavía no hay clientes. Crea el primero en Autenticación › Clientes y vuelve aquí.
+                </p>
+              ) : (
+                <div className="max-w-md">
+                  <FormField label="Cliente" htmlFor="client-pick">
+                    <Select
+                      id="client-pick"
+                      value={draft.clientId ?? ''}
+                      placeholder="Elige un cliente"
+                      onValueChange={(value) => setDraft({ ...draft, clientId: value || null })}
+                      options={data.authClients.map((client) => ({
+                        value: client.id,
+                        label: withPulso.has(client.id) ? `${client.name} · ya usa Pulso` : client.name,
+                      }))}
+                    />
                   </FormField>
-                )}
-              </div>
+                </div>
+              )}
             </>
           )}
 
@@ -185,23 +195,12 @@ export function NewClientWizard({ data, onCancel, onCreated }: NewClientWizardPr
           {step === 3 && (
             <>
               <p className="text-sm text-slate-500">
-                La primera persona que entra a Pulso en cada empresa. Si no tiene cuenta en Atmósfera, se crea con su DNI como contraseña inicial. Puedes dejarlo para después.
+                La primera persona que entra a Pulso en cada empresa. Búscala entre las cuentas de Atmósfera; si no tiene, créale una. Puedes dejarlo para después.
               </p>
               {draft.companies.map((company) => (
-                <div key={company.key} className="grid gap-3 rounded-xl border border-slate-200 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-                  <p className="text-sm font-semibold text-slate-900 sm:col-span-2">{company.tradeName}</p>
-                  <FormField label="DNI" htmlFor={`admin-dni-${company.key}`}>
-                    <Input
-                      id={`admin-dni-${company.key}`}
-                      value={company.adminDocument}
-                      inputMode="numeric"
-                      maxLength={8}
-                      onChange={(event) => setCompany({ ...company, adminDocument: event.target.value.replace(/\D/g, '') })}
-                    />
-                  </FormField>
-                  <FormField label="Nombre completo" htmlFor={`admin-name-${company.key}`}>
-                    <Input id={`admin-name-${company.key}`} value={company.adminName} onChange={(event) => setCompany({ ...company, adminName: event.target.value })} />
-                  </FormField>
+                <div key={company.key} className="space-y-3 rounded-xl border border-slate-200 p-4">
+                  <p className="text-sm font-semibold text-slate-900">{company.tradeName}</p>
+                  <AdminPicker idPrefix={`admin-${company.key}`} users={data.users} value={company.admin} onChange={(admin) => setCompany({ ...company, admin })} />
                 </div>
               ))}
             </>
@@ -213,7 +212,7 @@ export function NewClientWizard({ data, onCancel, onCreated }: NewClientWizardPr
                 {[
                   ['Empresas', draft.companies.length],
                   ['Sedes', branchTotal],
-                  ['Administradores', draft.companies.filter((company) => company.adminDocument).length],
+                  ['Administradores', draft.companies.filter((company) => company.admin).length],
                 ].map(([label, value]) => (
                   <div key={label} className="rounded-xl bg-slate-50 py-3">
                     <p className="text-2xl font-semibold text-slate-900 tabular-nums">{value}</p>
@@ -224,7 +223,7 @@ export function NewClientWizard({ data, onCancel, onCreated }: NewClientWizardPr
               <div className="rounded-xl border border-slate-200">
                 <div className="border-b border-slate-100 px-4 py-3">
                   <p className="text-sm font-semibold text-slate-900">{clientName}</p>
-                  <p className="text-xs text-slate-500">{existing ? 'Cliente que ya existe en Atmósfera' : 'Cliente nuevo'}</p>
+                  <p className="text-xs text-slate-500">{withPulso.has(draft.clientId ?? '') ? 'Ya usa Pulso: se le suman estas empresas' : 'Empieza a usar Pulso'}</p>
                 </div>
                 <ul className="divide-y divide-slate-100">
                   {draft.companies.map((company) => (
@@ -240,12 +239,12 @@ export function NewClientWizard({ data, onCancel, onCreated }: NewClientWizardPr
                         Módulos: {modules.filter((module) => module.kind === 'base').length} base
                         {company.modules.length ? ` + ${company.modules.map((code) => moduleName(modules, code)).join(', ')}` : ''}
                       </p>
-                      <p className="text-slate-600">Administrador: {company.adminName ? `${company.adminName} (DNI ${company.adminDocument})` : 'pendiente'}</p>
+                      <p className="text-slate-600">Administrador: {company.admin ? `${company.admin.fullName} (${formatUserDocument(company.admin)})${company.admin.userId ? '' : ' · cuenta nueva'}` : 'pendiente'}</p>
                     </li>
                   ))}
                 </ul>
               </div>
-              <p className="text-xs text-slate-500">Se crea el cliente y sus empresas en Atmósfera, se habilita Pulso en cada una y se preparan sus sedes, módulos y administradores.</p>
+              <p className="text-xs text-slate-500">Se crean las empresas en Atmósfera, se habilita Pulso en cada una y se preparan sus sedes, módulos y administradores.</p>
               {progress && (
                 <p role="status" className="rounded-lg bg-sky-50 px-4 py-3 text-sm text-sky-900">
                   {progress}

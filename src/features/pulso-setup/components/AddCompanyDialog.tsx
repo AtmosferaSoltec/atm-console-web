@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { pulsoErrorMessage } from '@/features/pulso'
-import { companyProblems, emptyCompany } from '../services/drafts'
+import { adminProblems, companyProblems, emptyCompany } from '../services/drafts'
 import { createCompanies } from '../services/pulsoAdminService'
 import type { AddCompanyDialogProps, AddCompanyFormProps, DraftCompany } from '../types/pulsoSetup.types'
+import { AdminPicker } from './AdminPicker'
 import { CompanyDraftFields } from './CompanyDraftFields'
 import { ModulePicker } from './ModulePicker'
 
@@ -22,7 +23,7 @@ function AddCompanyForm({ client, data, onClose, onCreated }: AddCompanyFormProp
   const [showProblems, setShowProblems] = useState(false)
   const [progress, setProgress] = useState<string | null>(null)
   const [failure, setFailure] = useState<string | null>(null)
-  const problems = companyProblems(draft)
+  const problems = [...companyProblems(draft), ...adminProblems(draft.admin)]
 
   const save = async () => {
     if (problems.length) {
@@ -49,6 +50,10 @@ function AddCompanyForm({ client, data, onClose, onCreated }: AddCompanyFormProp
       <div>
         <p className="mb-2 text-sm font-medium text-slate-700">Módulos</p>
         <ModulePicker modules={data.modules} selected={draft.modules} onChange={(modules) => setDraft({ ...draft, modules })} />
+      </div>
+      <div>
+        <p className="mb-2 text-sm font-medium text-slate-700">Administrador (opcional)</p>
+        <AdminPicker idPrefix="add-company-admin" users={data.users} value={draft.admin} onChange={(admin) => setDraft({ ...draft, admin })} />
       </div>
       {showProblems && problems.length > 0 && (
         <ul role="alert" className="space-y-1 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">

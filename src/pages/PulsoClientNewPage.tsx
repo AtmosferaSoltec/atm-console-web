@@ -11,7 +11,7 @@ export function PulsoClientNewPage() {
   return (
     <>
       <BackLink to={ROUTES.pulso.clients} label="Clientes y empresas" />
-      <PageHeader title="Nuevo cliente" description="Cliente, empresas, sedes, módulos y su primer administrador, en un solo paso." />
+      <PageHeader title="Agregar cliente a Pulso" description="Elige el cliente y prepara sus empresas, sedes, módulos y primer administrador, en un solo paso." />
       {data ? (
         <NewClientWizard data={data} onCancel={() => navigate(ROUTES.pulso.clients)} onCreated={(companyId) => navigate(pulsoCompanyPath(companyId))} />
       ) : (

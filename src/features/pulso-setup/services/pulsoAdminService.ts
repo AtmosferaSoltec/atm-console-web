@@ -1,7 +1,8 @@
-import { createClient, listClients } from '@/features/clients'
+import { listClients } from '@/features/clients'
 import { addMember, createBranch, listPulsoGroups, listPulsoModules, listPulsoTeam, updateBranch, updateGymFeatures } from '@/features/pulso'
 import type { Gym } from '@/features/pulso/types/pulso.types'
 import { createTenant, enableTenantSystem, listTenants } from '@/features/tenants'
+import { listUsers } from '@/features/users'
 import type { ClientDraft, ClientSummary, Company, CreationStep, DraftCompany, PulsoAdminData } from '../types/pulsoSetup.types'
 import { toModules } from './moduleCatalog'
 
@@ -13,12 +14,13 @@ const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompar
  * at least one gym.
  */
 export async function loadPulsoAdmin(signal: AbortSignal): Promise<PulsoAdminData> {
-  const [groups, authClients, team, catalog, tenants] = await Promise.all([
+  const [groups, authClients, team, catalog, tenants, users] = await Promise.all([
     listPulsoGroups(signal),
     listClients(signal),
     listPulsoTeam(signal),
     listPulsoModules(signal),
     listTenants(signal),
+    listUsers(signal),
   ])
   const gyms = groups.flatMap((group) => group.gyms)
   const companies: Company[] = gyms
@@ -37,7 +39,7 @@ export async function loadPulsoAdmin(signal: AbortSignal): Promise<PulsoAdminDat
       }
     })
     .sort(byName)
-  return { clients, companies, authClients: [...authClients].sort(byName), modules: toModules(catalog), systemId: team.systemId }
+  return { clients, companies, authClients: [...authClients].sort(byName), modules: toModules(catalog), users, systemId: team.systemId }
 }
 
 function toCompany(gym: Gym, members: Company['team'], tenants: Awaited<ReturnType<typeof listTenants>>): Company {
@@ -58,17 +60,13 @@ function toCompany(gym: Gym, members: Company['team'], tenants: Awaited<ReturnTy
 }
 
 /**
- * Creates the client (unless it already exists) and each company, then sets up each gym in Pulso: branches,
- * optional modules and its first admin. Returns the id of the first gym. A failure stops at that point; what was
- * created stays, and the list shows it.
+ * Gives Pulso to an existing client: creates each company, then sets up each gym in Pulso (branches, optional modules
+ * and its first admin). Returns the id of the first gym. A failure stops at that point; what was created stays, and
+ * the list shows it.
  */
-export async function createClientWithCompanies(draft: ClientDraft, systemId: string, onStep: CreationStep): Promise<string> {
-  let clientId = draft.existingClientId
-  if (!clientId) {
-    onStep(`Creando el cliente ${draft.name.trim()}…`)
-    clientId = (await createClient(draft.name.trim())).id
-  }
-  return createCompanies(clientId, draft.companies, systemId, onStep)
+export async function addClientToPulso(draft: ClientDraft, systemId: string, onStep: CreationStep): Promise<string> {
+  if (!draft.clientId) throw new Error('Elige un cliente.')
+  return createCompanies(draft.clientId, draft.companies, systemId, onStep)
 }
 
 export async function createCompanies(clientId: string, drafts: DraftCompany[], systemId: string, onStep: CreationStep): Promise<string> {
@@ -108,14 +106,15 @@ async function setUpGym(gym: Gym, draft: DraftCompany, systemId: string, onStep:
     await updateGymFeatures(gym.id, draft.modules)
   }
 
-  if (draft.adminDocument.trim()) {
+  if (draft.admin) {
     onStep(`Dando acceso al administrador de ${name}…`)
+    // An existing account is found again by its document number; a new one is created with it.
     await addMember({
       systemId,
       tenantId: gym.tenantId,
-      documentType: 'dni',
-      documentNumber: draft.adminDocument.trim(),
-      fullName: draft.adminName.trim(),
+      documentType: draft.admin.documentType,
+      documentNumber: draft.admin.documentNumber,
+      fullName: draft.admin.fullName.trim(),
       role: 'admin',
     })
   }

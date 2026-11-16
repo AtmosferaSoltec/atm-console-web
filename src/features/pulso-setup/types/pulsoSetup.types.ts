@@ -2,6 +2,7 @@ import type { LucideIcon } from 'lucide-react'
 import type { ClientItem } from '@/features/clients'
 import type { Branch, GymStatus, TeamMember } from '@/features/pulso/types/pulso.types'
 import type { TenantItem } from '@/features/tenants'
+import type { UserDocumentType, UserItem } from '@/features/users'
 
 /** Base: every company has it. Optional: the platform switches it on per company. */
 export type ModuleKind = 'base' | 'optional'
@@ -64,6 +65,8 @@ export interface PulsoAdminData {
   /** Every client of auth-api, also those without Pulso, to add Pulso to one of them. */
   authClients: ClientItem[]
   modules: PulsoModule[]
+  /** Every account of Atmósfera, to pick a gym's administrator. */
+  users: UserItem[]
   /** Id of the `pulso` system in auth-api, or null when it is not in the catalog. */
   systemId: string | null
 }
@@ -88,14 +91,30 @@ export interface DraftCompany {
   ruc: string
   branches: DraftBranch[]
   modules: string[]
-  adminDocument: string
-  adminName: string
+  /** The first administrator, or null to leave it for later. */
+  admin: AdminChoice | null
+}
+
+/** A gym's administrator: an existing account of Atmósfera, or a new one made from these fields. */
+export interface AdminChoice {
+  /** The existing account, or null to create it. */
+  userId: string | null
+  documentType: UserDocumentType
+  documentNumber: string
+  fullName: string
+}
+
+export interface AdminPickerProps {
+  users: UserItem[]
+  value: AdminChoice | null
+  onChange: (value: AdminChoice | null) => void
+  /** Prefix of the ids of its fields, unique in the page. */
+  idPrefix: string
 }
 
 export interface ClientDraft {
-  /** An existing client of auth-api, or null to create one named `name`. */
-  existingClientId: string | null
-  name: string
+  /** The client of auth-api that gets Pulso. Clients are created only in the Clients section of the console. */
+  clientId: string | null
   companies: DraftCompany[]
 }
 
@@ -167,6 +186,8 @@ export interface TeamMemberDialogProps {
   open: boolean
   company: Company
   systemId: string
+  /** Accounts of Atmósfera to pick from. */
+  users: UserItem[]
   onClose: () => void
   onSaved: () => void
 }
@@ -174,6 +195,8 @@ export interface TeamMemberDialogProps {
 export interface TeamMemberFormProps {
   company: Company
   systemId: string
+  /** Accounts of Atmósfera to pick from. */
+  users: UserItem[]
   onClose: () => void
   onSaved: () => void
 }

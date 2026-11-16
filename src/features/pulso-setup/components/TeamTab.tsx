@@ -1,16 +1,15 @@
 import { Info, Plus, Trash2, UserPlus } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
-import { FormField } from '@/components/common/FormField'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { usePulsoActions } from '@/features/pulso'
 import { roleLabel } from '@/features/pulso'
 import type { TeamMember } from '@/features/pulso/types/pulso.types'
-import { DocumentFields, isValidDocument, type UserDocumentType } from '@/features/users'
-import type { CompanyTabProps, TeamMemberDialogProps, TeamMemberFormProps } from '../types/pulsoSetup.types'
+import { adminProblems } from '../services/drafts'
+import type { AdminChoice, CompanyTabProps, TeamMemberDialogProps, TeamMemberFormProps } from '../types/pulsoSetup.types'
+import { AdminPicker } from './AdminPicker'
 
 function initials(name: string): string {
   return name
@@ -22,17 +21,19 @@ function initials(name: string): string {
     .toUpperCase()
 }
 
-function TeamMemberForm({ company, systemId, onClose, onSaved }: TeamMemberFormProps) {
-  const [documentType, setDocumentType] = useState<UserDocumentType>('dni')
-  const [documentNumber, setDocumentNumber] = useState('')
-  const [fullName, setFullName] = useState('')
+function TeamMemberForm({ company, systemId, users, onClose, onSaved }: TeamMemberFormProps) {
+  const [admin, setAdmin] = useState<AdminChoice | null>(null)
   const { addMember, isBusy, error, clearError } = usePulsoActions()
-  const valid = isValidDocument(documentType, documentNumber) && fullName.trim() !== '' && !isBusy
+  // People who already work in this company are not offered again.
+  const inTeam = new Set(company.team.map((member) => member.userId))
+  const candidates = users.filter((user) => !inTeam.has(user.id))
+  const valid = admin !== null && adminProblems(admin).length === 0 && !isBusy
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
-    if (!valid) return
-    if (await addMember({ systemId, tenantId: company.tenantId, documentType, documentNumber, fullName: fullName.trim(), role: 'admin' })) {
+    if (!admin || !valid) return
+    const input = { systemId, tenantId: company.tenantId, documentType: admin.documentType, documentNumber: admin.documentNumber, fullName: admin.fullName.trim(), role: 'admin' }
+    if (await addMember(input)) {
       onSaved()
       onClose()
     }
@@ -40,18 +41,15 @@ function TeamMemberForm({ company, systemId, onClose, onSaved }: TeamMemberFormP
 
   return (
     <form className="space-y-4" onSubmit={submit} onChange={clearError}>
-      <DocumentFields
+      <AdminPicker
         idPrefix="team-admin"
-        documentType={documentType}
-        documentNumber={documentNumber}
-        onDocumentTypeChange={setDocumentType}
-        onDocumentNumberChange={setDocumentNumber}
-        hint="Si ya tiene cuenta en Atmósfera se usa esa. Si no, se crea con su número de documento como clave inicial."
-        autoFocus
+        users={candidates}
+        value={admin}
+        onChange={(next) => {
+          clearError()
+          setAdmin(next)
+        }}
       />
-      <FormField label="Nombre completo" htmlFor="team-admin-name">
-        <Input id="team-admin-name" value={fullName} maxLength={200} onChange={(event) => setFullName(event.target.value)} />
-      </FormField>
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}
@@ -69,10 +67,10 @@ function TeamMemberForm({ company, systemId, onClose, onSaved }: TeamMemberFormP
   )
 }
 
-function TeamMemberDialog({ open, company, systemId, onClose, onSaved }: TeamMemberDialogProps) {
+function TeamMemberDialog({ open, company, systemId, users, onClose, onSaved }: TeamMemberDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} title="Nuevo administrador" description={`Administra ${company.tradeName} en Pulso: su personal, planes y tarifas.`}>
-      {open && <TeamMemberForm company={company} systemId={systemId} onClose={onClose} onSaved={onSaved} />}
+      {open && <TeamMemberForm company={company} systemId={systemId} users={users} onClose={onClose} onSaved={onSaved} />}
     </Dialog>
   )
 }
@@ -141,7 +139,7 @@ export function TeamTab({ company, data, onChanged }: CompanyTabProps) {
         </>
       )}
 
-      {systemId && <TeamMemberDialog open={adding} company={company} systemId={systemId} onClose={() => setAdding(false)} onSaved={onChanged} />}
+      {systemId && <TeamMemberDialog open={adding} company={company} systemId={systemId} users={data.users} onClose={() => setAdding(false)} onSaved={onChanged} />}
       <ConfirmDialog
         open={removing !== null}
         onClose={() => setRemoving(null)}

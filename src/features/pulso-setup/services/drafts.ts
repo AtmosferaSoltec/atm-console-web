@@ -1,4 +1,5 @@
-import type { ClientDraft, DraftBranch, DraftCompany } from '../types/pulsoSetup.types'
+import { isValidDocument } from '@/features/users'
+import type { AdminChoice, ClientDraft, DraftBranch, DraftCompany } from '../types/pulsoSetup.types'
 
 function key(): string {
   return crypto.randomUUID()
@@ -9,11 +10,11 @@ export function emptyBranch(name = ''): DraftBranch {
 }
 
 export function emptyCompany(tradeName = ''): DraftCompany {
-  return { key: key(), tradeName, ruc: '', branches: [emptyBranch('Sede principal')], modules: [], adminDocument: '', adminName: '' }
+  return { key: key(), tradeName, ruc: '', branches: [emptyBranch('Sede principal')], modules: [], admin: null }
 }
 
 export function emptyClient(): ClientDraft {
-  return { existingClientId: null, name: '', companies: [emptyCompany()] }
+  return { clientId: null, companies: [emptyCompany()] }
 }
 
 /** Problems that stop a company from being created, in Spanish, or an empty list. */
@@ -22,7 +23,14 @@ export function companyProblems(draft: DraftCompany): string[] {
   if (!draft.tradeName.trim()) problems.push('Falta el nombre comercial.')
   if (draft.ruc.trim() && !/^\d{11}$/.test(draft.ruc.trim())) problems.push('El RUC debe tener 11 dígitos.')
   if (!draft.branches.some((branch) => branch.name.trim())) problems.push('Agrega al menos una sede.')
-  if (draft.adminDocument.trim() && !/^\d{8}$/.test(draft.adminDocument.trim())) problems.push('El DNI del administrador debe tener 8 dígitos.')
-  if (draft.adminDocument.trim() && !draft.adminName.trim()) problems.push('Falta el nombre del administrador.')
+  return problems
+}
+
+/** Problems with a chosen administrator, in Spanish; a new account needs a valid document and a name. */
+export function adminProblems(admin: AdminChoice | null): string[] {
+  if (!admin || admin.userId) return []
+  const problems: string[] = []
+  if (!isValidDocument(admin.documentType, admin.documentNumber)) problems.push('El documento del administrador no es válido.')
+  if (!admin.fullName.trim()) problems.push('Falta el nombre del administrador.')
   return problems
 }

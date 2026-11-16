@@ -1,17 +1,17 @@
 import { PULSO_API_BASE_URL } from '@/config/env'
 import { assignAccess, listAccessBySystem, removeAccess } from '@/features/access'
 import { listSystems } from '@/features/systems'
-import { createTenant, enableTenantSystem } from '@/features/tenants'
 import { createUser, listUsers } from '@/features/users'
 import { request } from '@/services/httpClient'
 import type {
   Branch,
   BranchInput,
   BranchResponse,
-  NewGymInput,
   NewMemberInput,
   PulsoGroup,
+  GymStatus,
   PulsoGroupListResponse,
+  PulsoModuleResponse,
   PulsoTeam,
 } from '../types/pulso.types'
 
@@ -38,26 +38,10 @@ export async function listPulsoGroups(signal?: AbortSignal): Promise<PulsoGroup[
       name: gym.name,
       brandColor: gym.brand_color || DEFAULT_BRAND_COLOR,
       features: gym.features ?? [],
+      status: gym.status ?? 'active',
       branches: gym.branches.map(toBranch),
     })),
   }))
-}
-
-export async function createGroup(name: string): Promise<void> {
-  await request<unknown>(`${ADMIN_PATH}/groups`, { method: 'POST', body: { name }, baseUrl: PULSO_API_BASE_URL })
-}
-
-export async function renameGroup(groupId: string, name: string): Promise<void> {
-  await request<unknown>(`${ADMIN_PATH}/groups/${groupId}`, { method: 'PATCH', body: { name }, baseUrl: PULSO_API_BASE_URL })
-}
-
-/** Pulso refuses (409 GROUP_IN_USE) while the group still has gyms. */
-export async function deleteGroup(groupId: string): Promise<void> {
-  await request<void>(`${ADMIN_PATH}/groups/${groupId}`, { method: 'DELETE', baseUrl: PULSO_API_BASE_URL })
-}
-
-export async function moveGym(gymId: string, groupId: string): Promise<void> {
-  await request<unknown>(`${ADMIN_PATH}/gyms/${gymId}`, { method: 'PATCH', body: { group_id: groupId }, baseUrl: PULSO_API_BASE_URL })
 }
 
 export async function updateGymColor(gymId: string, brandColor: string): Promise<void> {
@@ -67,6 +51,17 @@ export async function updateGymColor(gymId: string, brandColor: string): Promise
 /** Replaces the optional modules of a gym (the complete list: what is not sent is switched off). */
 export async function updateGymFeatures(gymId: string, features: string[]): Promise<void> {
   await request<unknown>(`${ADMIN_PATH}/gyms/${gymId}/features`, { method: 'PATCH', body: { features }, baseUrl: PULSO_API_BASE_URL })
+}
+
+/** Suspending locks the gym's people out of Pulso at once; reactivating lets them back in. Nothing is deleted. */
+export async function updateGymStatus(gymId: string, status: GymStatus): Promise<void> {
+  await request<unknown>(`${ADMIN_PATH}/gyms/${gymId}/status`, { method: 'PATCH', body: { status }, baseUrl: PULSO_API_BASE_URL })
+}
+
+/** What Pulso can do: the base modules every gym has and the optional ones switched on per gym. */
+export async function listPulsoModules(signal?: AbortSignal): Promise<PulsoModuleResponse[]> {
+  const { data } = await request<{ data: PulsoModuleResponse[] }>(`${ADMIN_PATH}/modules`, { baseUrl: PULSO_API_BASE_URL, signal })
+  return data
 }
 
 export async function createBranch(gymId: string, input: BranchInput): Promise<Branch> {
@@ -96,19 +91,6 @@ export async function listPulsoTeam(signal?: AbortSignal): Promise<PulsoTeam> {
   const system = (await listSystems(signal)).find((item) => item.code === PULSO_SYSTEM_CODE)
   if (!system) return { systemId: null, members: [] }
   return { systemId: system.id, members: await listAccessBySystem(system.id, signal) }
-}
-
-/**
- * A gym is a company of an auth client with Pulso enabled. Pulso records the gym itself, with its main branch, the
- * next time the groups are listed, and puts it in the group of any gym of the same client (or a new group). So
- * the groups are listed once to find the new gym and move it to the chosen group when it landed elsewhere.
- * The company needs only a name: it has no RUC.
- */
-export async function createGym(input: NewGymInput): Promise<void> {
-  const tenant = await createTenant({ ruc: '', legalName: input.name, tradeName: '', clientId: input.authClientId })
-  await enableTenantSystem(tenant.id, input.systemId)
-  const gym = (await listPulsoGroups()).flatMap((group) => group.gyms).find((item) => item.tenantId === tenant.id)
-  if (gym && gym.groupId !== input.groupId) await moveGym(gym.id, input.groupId)
 }
 
 /** Gives a person access to the gym's company, creating their account by document when it does not exist. */

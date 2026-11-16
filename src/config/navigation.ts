@@ -3,7 +3,6 @@ import {
   Briefcase,
   Building2,
   Database,
-  Dumbbell,
   FileText,
   Files,
   Gauge,
@@ -14,6 +13,7 @@ import {
   ListChecks,
   LayoutTemplate,
   MessagesSquare,
+  Puzzle,
   Receipt,
   ShieldCheck,
   Smartphone,
@@ -40,7 +40,10 @@ const SYSTEM_GROUPS: NavGroup[] = [
   },
   {
     label: 'Pulso',
-    items: [{ label: 'Grupos y gimnasios', to: ROUTES.pulso.branches, icon: Dumbbell }],
+    items: [
+      { label: 'Clientes y empresas', to: ROUTES.pulso.clients, icon: Building2 },
+      { label: 'Catálogo de módulos', to: ROUTES.pulso.modules, icon: Puzzle },
+    ],
   },
   {
     label: 'Orbita',

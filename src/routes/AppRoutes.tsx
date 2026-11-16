@@ -14,7 +14,10 @@ import { LavendimiaCompaniesPage } from '@/pages/LavendimiaCompaniesPage'
 import { LavendimiaRolesPage } from '@/pages/LavendimiaRolesPage'
 import { LavendimiaUsersPage } from '@/pages/LavendimiaUsersPage'
 import { OrbitaUsersPage } from '@/pages/OrbitaUsersPage'
-import { PulsoPage } from '@/pages/PulsoPage'
+import { PulsoClientNewPage } from '@/pages/PulsoClientNewPage'
+import { PulsoClientsPage } from '@/pages/PulsoClientsPage'
+import { PulsoCompanyPage } from '@/pages/PulsoCompanyPage'
+import { PulsoModulesPage } from '@/pages/PulsoModulesPage'
 import { StorageOverviewPage } from '@/pages/StorageOverviewPage'
 import { TemplatesPage } from '@/pages/TemplatesPage'
 import { MessagingSystemsPage } from '@/pages/MessagingSystemsPage'
@@ -83,7 +86,11 @@ export function AppRoutes() {
           <Route path={ROUTES.lavendimia.companies} element={<LavendimiaCompaniesPage />} />
           <Route path={ROUTES.lavendimia.users} element={<LavendimiaUsersPage />} />
           <Route path={ROUTES.lavendimia.roles} element={<LavendimiaRolesPage />} />
-          <Route path={ROUTES.pulso.branches} element={<PulsoPage />} />
+          <Route path={ROUTES.pulso.clients} element={<PulsoClientsPage />} />
+          <Route path={ROUTES.pulso.clientNew} element={<PulsoClientNewPage />} />
+          <Route path={ROUTES.pulso.company} element={<PulsoCompanyPage />} />
+          <Route path={ROUTES.pulso.modules} element={<PulsoModulesPage />} />
+          <Route path={ROUTES.pulso.legacyBranches} element={<Navigate to={ROUTES.pulso.clients} replace />} />
           <Route path={ROUTES.orbita.users} element={<OrbitaUsersPage />} />
           <Route path={ROUTES.collections.clients} element={<CollectionsClientsPage />} />
           <Route path={ROUTES.collections.charges} element={<CollectionsChargesPage />} />

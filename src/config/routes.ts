@@ -47,7 +47,12 @@ export const ROUTES = {
     roles: '/lavendimia/roles',
   },
   pulso: {
-    branches: '/pulso/branches',
+    clients: '/pulso/clients',
+    clientNew: '/pulso/clients/new',
+    company: '/pulso/clients/companies/:companyId',
+    modules: '/pulso/modules',
+    /** The old groups screen; it now leads to the clients. */
+    legacyBranches: '/pulso/branches',
   },
   orbita: {
     users: '/orbita/users',
@@ -91,4 +96,8 @@ export function statementPath(token: string): string {
 /** The charges page with one client already chosen. */
 export function collectionsChargesPath(clientId: string): string {
   return `/collections/charges?client=${encodeURIComponent(clientId)}`
+}
+
+export function pulsoCompanyPath(companyId: string): string {
+  return `/pulso/clients/companies/${companyId}`
 }

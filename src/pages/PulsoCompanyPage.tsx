@@ -6,12 +6,25 @@ import { Card } from '@/components/ui/card'
 import { Select } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ROUTES, pulsoCompanyPath } from '@/config/routes'
-import { BranchesTab, CompanyAvatar, GeneralTab, GymPreview, LoadState, ModulesTab, TeamTab, useCompanyDetail, usePulsoAdmin } from '@/features/pulso-setup'
+import {
+  BranchesTab,
+  CompanyAvatar,
+  GeneralTab,
+  GymPreview,
+  LoadState,
+  ModulesTab,
+  ProductCategoriesTab,
+  TeamTab,
+  companyHasModule,
+  useCompanyDetail,
+  usePulsoAdmin,
+} from '@/features/pulso-setup'
 
 const TABS = [
   { value: 'modules', label: 'Módulos' },
   { value: 'branches', label: 'Sedes' },
   { value: 'team', label: 'Equipo' },
+  { value: 'categories', label: 'Categorías', module: 'sales' },
   { value: 'general', label: 'General' },
   { value: 'preview', label: 'Vista previa' },
 ] as const
@@ -22,7 +35,9 @@ export function PulsoCompanyPage() {
   const [params, setParams] = useSearchParams()
   const { data, error, reload } = usePulsoAdmin()
   const detail = useCompanyDetail(data, companyId)
-  const tab = TABS.some((item) => item.value === params.get('tab')) ? (params.get('tab') as string) : 'modules'
+  // A tab of a module (product categories: sales) only exists while the company has that module.
+  const tabs = TABS.filter((item) => !('module' in item) || (data && detail && companyHasModule(data.modules, detail.company, item.module)))
+  const tab = tabs.some((item) => item.value === params.get('tab')) ? (params.get('tab') as string) : 'modules'
 
   if (!data || !detail) {
     return (
@@ -69,7 +84,7 @@ export function PulsoCompanyPage() {
       <Card>
         <Tabs value={tab} onValueChange={(value) => setParams({ tab: value }, { replace: true })}>
           <TabsList className="overflow-x-auto">
-            {TABS.map((item) => (
+            {tabs.map((item) => (
               <TabsTrigger key={item.value} value={item.value}>
                 {item.label}
               </TabsTrigger>
@@ -85,6 +100,11 @@ export function PulsoCompanyPage() {
             <TabsContent value="team">
               <TeamTab key={company.id} company={company} data={data} onChanged={reload} />
             </TabsContent>
+            {tab === 'categories' && (
+              <TabsContent value="categories">
+                <ProductCategoriesTab key={company.id} company={company} data={data} onChanged={reload} />
+              </TabsContent>
+            )}
             <TabsContent value="general">
               <GeneralTab key={company.id} company={company} data={data} onChanged={reload} />
             </TabsContent>

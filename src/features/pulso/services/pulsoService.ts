@@ -13,6 +13,9 @@ import type {
   PulsoGroupListResponse,
   PulsoModuleResponse,
   PulsoTeam,
+  ProductCategoriesAdded,
+  ProductCategory,
+  ProductCategoryResponse,
 } from '../types/pulso.types'
 
 const ADMIN_PATH = '/api/v1/admin'
@@ -104,4 +107,33 @@ export async function addMember(input: NewMemberInput): Promise<void> {
 
 export async function removeMember(accessId: string): Promise<void> {
   await removeAccess(accessId)
+}
+
+function toCategory(category: ProductCategoryResponse): ProductCategory {
+  return { id: category.id, name: category.name, position: category.position, productCount: category.product_count ?? 0 }
+}
+
+/** The gym's product categories (module sales), by position. */
+export async function listProductCategories(gymId: string, signal?: AbortSignal): Promise<ProductCategory[]> {
+  const { data } = await request<{ data: ProductCategoryResponse[] }>(`${ADMIN_PATH}/gyms/${gymId}/product-categories`, { baseUrl: PULSO_API_BASE_URL, signal })
+  return data.map(toCategory)
+}
+
+/** Adds many categories at once; pulso-api skips the names the gym already has (ignoring case). */
+export async function addProductCategories(gymId: string, names: string[]): Promise<ProductCategoriesAdded> {
+  const { data } = await request<{ data: { created: ProductCategoryResponse[]; skipped: string[] } }>(`${ADMIN_PATH}/gyms/${gymId}/product-categories`, {
+    method: 'POST',
+    body: { names },
+    baseUrl: PULSO_API_BASE_URL,
+  })
+  return { created: data.created.map(toCategory), skipped: data.skipped }
+}
+
+export async function renameProductCategory(gymId: string, categoryId: string, name: string): Promise<void> {
+  await request<unknown>(`${ADMIN_PATH}/gyms/${gymId}/product-categories/${categoryId}`, { method: 'PATCH', body: { name }, baseUrl: PULSO_API_BASE_URL })
+}
+
+/** Its products stay, without category. */
+export async function deleteProductCategory(gymId: string, categoryId: string): Promise<void> {
+  await request<void>(`${ADMIN_PATH}/gyms/${gymId}/product-categories/${categoryId}`, { method: 'DELETE', baseUrl: PULSO_API_BASE_URL })
 }

@@ -96,3 +96,25 @@ export interface NewMemberInput {
   fullName: string
   role: string
 }
+
+/** A product category of a gym as pulso-api answers it to the console (with how many products it has). */
+export interface ProductCategoryResponse {
+  id: string
+  name: string
+  position: number
+  product_count?: number
+}
+
+export interface ProductCategory {
+  id: string
+  name: string
+  position: number
+  /** Products (on sale or retired) in this category: deleting it leaves them without one. */
+  productCount: number
+}
+
+/** The answer to a bulk creation: what was created and the names skipped (the gym had them, or repeated). */
+export interface ProductCategoriesAdded {
+  created: ProductCategory[]
+  skipped: string[]
+}

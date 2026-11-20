@@ -5,6 +5,8 @@ import { ApiError } from '@/services/httpClient'
 
 const ERROR_MESSAGES: Record<string, string> = {
   BRANCH_IN_USE: 'Esta sede ya tiene movimientos y no se puede eliminar.',
+  CATEGORY_NAME_TAKEN: 'El gimnasio ya tiene una categoría con ese nombre.',
+  CATEGORY_NOT_FOUND: 'La categoría ya no existe.',
   STATUS_INVALID: 'El estado elegido no existe.',
   FEATURES_INVALID: 'Alguno de los módulos elegidos no existe.',
   VALIDATION_FAILED: 'Revisa los datos ingresados.',

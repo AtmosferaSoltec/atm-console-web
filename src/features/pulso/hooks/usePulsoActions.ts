@@ -1,5 +1,16 @@
 import { useState } from 'react'
-import { addMember, createBranch, deleteBranch, removeMember, updateBranch, updateGymColor, updateGymFeatures, updateGymStatus } from '../services/pulsoService'
+import {
+  addMember,
+  createBranch,
+  deleteBranch,
+  deleteProductCategory,
+  removeMember,
+  renameProductCategory,
+  updateBranch,
+  updateGymColor,
+  updateGymFeatures,
+  updateGymStatus,
+} from '../services/pulsoService'
 import type { BranchInput, GymStatus, NewMemberInput } from '../types/pulso.types'
 import { pulsoErrorMessage } from './pulsoErrors'
 
@@ -35,5 +46,8 @@ export function usePulsoActions() {
       run(() => updateGymStatus(gymId, status), status === 'suspended' ? 'No se pudo suspender. Intenta de nuevo.' : 'No se pudo reactivar. Intenta de nuevo.'),
     addMember: (input: NewMemberInput) => run(() => addMember(input), 'No se pudo agregar a la persona. Intenta de nuevo.'),
     removeMember: (accessId: string) => run(() => removeMember(accessId), 'No se pudo quitar el acceso. Intenta de nuevo.'),
+    renameCategory: (gymId: string, categoryId: string, name: string) =>
+      run(() => renameProductCategory(gymId, categoryId, name), 'No se pudo renombrar la categoría. Intenta de nuevo.'),
+    removeCategory: (gymId: string, categoryId: string) => run(() => deleteProductCategory(gymId, categoryId), 'No se pudo eliminar la categoría. Intenta de nuevo.'),
   }
 }

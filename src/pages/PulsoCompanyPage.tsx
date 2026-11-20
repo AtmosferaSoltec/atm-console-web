@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card'
 import { Select } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ROUTES, pulsoCompanyPath } from '@/config/routes'
-import { BranchesTab, GeneralTab, GymPreview, LoadState, ModulesTab, TeamTab, useCompanyDetail, usePulsoAdmin } from '@/features/pulso-setup'
+import { BranchesTab, CompanyAvatar, GeneralTab, GymPreview, LoadState, ModulesTab, TeamTab, useCompanyDetail, usePulsoAdmin } from '@/features/pulso-setup'
 
 const TABS = [
   { value: 'modules', label: 'Módulos' },
@@ -41,9 +41,7 @@ export function PulsoCompanyPage() {
       <BackLink to={ROUTES.pulso.clients} label="Clientes y empresas" />
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-xl text-lg font-semibold text-white" style={{ backgroundColor: company.brandColor }}>
-            {company.tradeName.slice(0, 1).toUpperCase()}
-          </span>
+          <CompanyAvatar logoFileId={company.tenant?.logoFileId ?? ''} name={company.tradeName} color={company.brandColor} className="size-12 rounded-xl text-lg" />
           <div className="min-w-0">
             <p className="text-sm text-slate-500">{client.name}</p>
             <h1 className="flex flex-wrap items-center gap-2 text-2xl font-semibold tracking-tight text-slate-900">

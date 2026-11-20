@@ -244,3 +244,23 @@ export interface LoadStateProps {
   error: string | null
   onRetry: () => void
 }
+
+export interface CompanyAvatarProps {
+  /** Id of the logo in the storage API, or '' when the company has none. */
+  logoFileId: string
+  /** Trade name: the image description and the source of the monogram. */
+  name: string
+  /** Brand colour behind the monogram. */
+  color: string
+  /** Size and text classes of the square. */
+  className?: string
+}
+
+export interface ColorFieldProps {
+  /** Saved colour as "#rrggbb". */
+  value: string
+  /** Saves the colour; resolves true when it was saved. */
+  onSave: (color: string) => Promise<boolean>
+  busy: boolean
+  error: string | null
+}

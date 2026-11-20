@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { pulsoCompanyPath } from '@/config/routes'
 import { moduleName } from '../services/moduleCatalog'
+import { CompanyAvatar } from './CompanyAvatar'
 import type { ClientCardProps } from '../types/pulsoSetup.types'
 
 function plural(count: number, one: string, many: string): string {
@@ -38,9 +39,7 @@ export function ClientCard({ summary, modules, onAddCompany }: ClientCardProps) 
               className="group grid items-center gap-3 px-5 py-4 transition hover:bg-slate-50/80 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.6fr)_auto]"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg text-sm font-semibold text-white" style={{ backgroundColor: company.brandColor }}>
-                  {company.tradeName.slice(0, 1).toUpperCase()}
-                </span>
+                <CompanyAvatar logoFileId={company.tenant?.logoFileId ?? ''} name={company.tradeName} color={company.brandColor} className="size-9 text-sm" />
                 <span className="min-w-0">
                   <span className="flex items-center gap-2 font-medium text-slate-900">
                     <span className="truncate">{company.tradeName}</span>

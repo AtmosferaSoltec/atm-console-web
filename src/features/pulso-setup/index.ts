@@ -4,6 +4,7 @@
  */
 export { AddCompanyDialog } from './components/AddCompanyDialog'
 export { BranchesTab } from './components/BranchesTab'
+export { CompanyAvatar } from './components/CompanyAvatar'
 export { ClientCard } from './components/ClientCard'
 export { GeneralTab } from './components/GeneralTab'
 export { GymPreview } from './components/GymPreview'

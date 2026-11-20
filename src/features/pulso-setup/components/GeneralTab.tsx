@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { usePulsoActions } from '@/features/pulso'
 import { EditTenantDialog } from '@/features/tenants'
+import { ColorField } from './ColorField'
 import type { CompanyTabProps } from '../types/pulsoSetup.types'
-
-const BRAND_COLORS = ['#17677b', '#0fa68f', '#2f4f8f', '#6b3fa0', '#b4471b', '#c0392b', '#3d6b45', '#1a1a1a']
 
 /** Profile of the company (kept in auth-api), its brand colour in Pulso and whether its people can work. */
 export function GeneralTab({ company, onChanged }: CompanyTabProps) {
@@ -18,13 +17,12 @@ export function GeneralTab({ company, onChanged }: CompanyTabProps) {
   const statusActions = usePulsoActions()
   const suspended = company.status === 'suspended'
   const tenant = company.tenant
-  const colors = BRAND_COLORS.includes(color) ? BRAND_COLORS : [...BRAND_COLORS, color]
 
-  const pickColor = async (next: string) => {
-    const previous = color
+  const saveColor = async (next: string): Promise<boolean> => {
+    if (!(await colorActions.setColor(company.id, next))) return false
     setColor(next)
-    if (await colorActions.setColor(company.id, next)) onChanged()
-    else setColor(previous)
+    onChanged()
+    return true
   }
 
   const setStatus = async (next: 'active' | 'suspended') => {
@@ -77,30 +75,11 @@ export function GeneralTab({ company, onChanged }: CompanyTabProps) {
         <CardHeader>
           <div>
             <CardTitle>Color de marca</CardTitle>
-            <CardDescription>Pinta los botones y la boleta de Pulso para este gimnasio. Se guarda al elegirlo.</CardDescription>
+            <CardDescription>Pinta los botones y la boleta de Pulso para este gimnasio. Elige uno rápido, escribe el HEX del cliente o usa el selector, y guarda.</CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Color de marca">
-            {colors.map((item) => (
-              <button
-                key={item}
-                type="button"
-                role="radio"
-                aria-checked={color === item}
-                aria-label={item}
-                disabled={colorActions.isBusy}
-                onClick={() => void pickColor(item)}
-                className="size-8 cursor-pointer rounded-full ring-offset-2 transition aria-checked:ring-2 aria-checked:ring-slate-900 disabled:cursor-wait"
-                style={{ backgroundColor: item }}
-              />
-            ))}
-          </div>
-          {colorActions.error && (
-            <p role="alert" className="text-sm text-red-600">
-              {colorActions.error}
-            </p>
-          )}
+        <CardContent>
+          <ColorField value={color} onSave={saveColor} busy={colorActions.isBusy} error={colorActions.error} />
         </CardContent>
       </Card>
 

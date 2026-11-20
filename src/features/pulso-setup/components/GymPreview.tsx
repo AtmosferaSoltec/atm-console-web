@@ -1,6 +1,7 @@
 import { BarChart3, ChevronDown, CreditCard, DoorOpen, LayoutDashboard, Settings, ShoppingBag, ShoppingCart, Tablet, Users } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/utils/cn'
+import { CompanyAvatar } from './CompanyAvatar'
 import type { GymPreviewProps, PreviewLink, TeamRole } from '../types/pulsoSetup.types'
 import { companyHasModule } from '../services/moduleCatalog'
 
@@ -60,9 +61,7 @@ export function GymPreview({ company, modules }: GymPreviewProps) {
         <div className="grid min-h-[420px] md:grid-cols-[220px_minmax(0,1fr)]">
           <aside className="flex flex-col gap-3 border-b border-slate-200 bg-white p-3 md:border-r md:border-b-0">
             <div className="flex items-center gap-2.5 px-1">
-              <span className="flex size-9 items-center justify-center rounded-lg text-sm font-semibold text-white" style={{ backgroundColor: company.brandColor }}>
-                {company.tradeName.slice(0, 1).toUpperCase()}
-              </span>
+              <CompanyAvatar logoFileId={company.tenant?.logoFileId ?? ''} name={company.tradeName} color={company.brandColor} className="size-9 text-sm" />
               <span className="truncate text-sm font-semibold text-slate-900">{company.tradeName}</span>
             </div>
             {manyBranches && (
